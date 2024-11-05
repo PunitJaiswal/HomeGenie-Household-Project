@@ -16,12 +16,13 @@ def create_data(user_datastore):
             email='admin@iitm.ac.in',
             password=hash_password('pass'),
             roles=['admin'],
+            username='admin',
             active=True
     )
     if not user_datastore.find_user(email='professional@iitm.ac.in'):
-        user_datastore.create_user(email='professional@iitm.ac.in', password=hash_password('pass'), roles=['professional'], active=True)
+        user_datastore.create_user(email='professional@iitm.ac.in', password=hash_password('pass'),username='professional1', roles=['professional'], active=True)
     if not user_datastore.find_user(email='customer@gmail.com'):
-        user_datastore.create_user(email='customer@gmail.com', password=hash_password('pass'), roles=['customer'], active=True)
+        user_datastore.create_user(email='customer@gmail.com', password=hash_password('pass'), username='customer1', roles=['customer'], active=True)
     
 
     db.session.commit()

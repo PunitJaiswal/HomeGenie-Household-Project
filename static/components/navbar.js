@@ -1,10 +1,10 @@
 const navbar = {
     template : `
     <nav>
-        <router-link to='/'></router-view>
-        <router-link to='/login'>Login</router-view>
-        <router-link to='/signup'>Signup</router-view>
-        <router-link to='/logout'>Logout</router-view>
+        <router-link to='/'>Home</router-link>||
+        <router-link to='/login'>Login</router-link>||
+        <router-link to='/signup'>Signup</router-link>||
+        <a :href="url">Logout</a>
     </nav>
     `,
     data() {
