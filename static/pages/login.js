@@ -25,12 +25,11 @@ const login = {
                 body : JSON.stringify({email : this.email, password : this.password}),
             });
             if (res.ok) {
-                this.$router.push('/')
+                this.$router.push('/profile');
+            } else{
+                console.error('Login Failed');
             }
-            else{
-                console.error('Login Failed')
-            }
-        }
+        },
     }
 };
 

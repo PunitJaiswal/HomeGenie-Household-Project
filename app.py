@@ -3,6 +3,8 @@ from flask_security import Security, SQLAlchemyUserDatastore
 from views import create_view
 from models import *
 from create_initial_data import create_data
+import resources
+
 
 security = Security()
 
@@ -13,6 +15,7 @@ def create_app():
     app.config['SECRET_KEY'] = 'abcdefghijklmnopqrstuvwxyz'
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
     app.config['SECURITY_PASSWORD_SALT'] = 'password-salt'
+    app.config['SECURITY_TOKEN_AUTHENTICATION_HEADER'] = 'Authentication-Token'
 
     # tell flask to use sql_alchemy db
     db.init_app(app)
@@ -31,7 +34,9 @@ def create_app():
 
     # Setup the view
     create_view(app, user_datastore, db)
-
+    # Connect Flask to falsk_restful
+    resources.api.init_app(app)
+    
     return app
 
 if __name__ == '__main__':

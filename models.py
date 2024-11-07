@@ -32,14 +32,19 @@ class UserRoles(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     role_id = db.Column(db.Integer, db.ForeignKey('role.id'))
 
+class Service(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+    description = db.Column(db.String)
+    base_price = db.Column(db.Integer, nullable=False)
+    time_required = db.Column(db.Integer)
 
-
-
-
-#     ID
-# Name
-# Date created
-# Description
-# service_type
-# Experience
-# etc.
+class Service_request(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    customer_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    service_id = db.Column(db.Integer, db.ForeignKey('service.id'), nullable=False)
+    professional_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # Added professional_id field
+    date_of_request = db.Column(db.DateTime, default=datetime.utcnow)
+    date_of_completion = db.Column(db.DateTime)
+    status = db.Column(db.String)
+    remarks = db.Column(db.String)

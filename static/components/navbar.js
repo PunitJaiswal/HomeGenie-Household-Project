@@ -4,14 +4,14 @@ const navbar = {
         <router-link to='/'>Home</router-link>||
         <router-link to='/login'>Login</router-link>||
         <router-link to='/signup'>Signup</router-link>||
-        <a :href="url">Logout</a>
+        <a :href="logoutURL">Logout</a>
     </nav>
     `,
     data() {
         return{
-            url : window.location.origin + "/logout"
-        }
-    }
+            logoutURL : window.location.origin + "/logout"
+        };
+    },
 };
 
 
