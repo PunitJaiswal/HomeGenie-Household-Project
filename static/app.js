@@ -1,5 +1,5 @@
-import navbar from './components/navbar.js'
-import router from './utils/router.js'
+import router from "./utils/router.js"
+import Navbar from "./components/navbar.js"
 
 new Vue({
     el : '#app',
@@ -11,6 +11,6 @@ new Vue({
     `,
     router,
     components : {
-        navbar,
+        Navbar,
     },
-})
+});

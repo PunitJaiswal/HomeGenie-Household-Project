@@ -15,13 +15,13 @@ service_fields = {
 }
 
 class Services(Resource):
-    @auth_required()
+    @auth_required('token')
     @marshal_with(service_fields)
     def get(self):
         all_services = Service.query.all()
         return all_services, 200  # Include status code
     
-    @auth_required()
+    @auth_required('token')
     def post(self):
         # Define argument parser for the post method
         parser = reqparse.RequestParser()

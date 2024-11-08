@@ -12,11 +12,15 @@ def create_app():
     app = Flask(__name__)
 
     # Configuration
+    app.config['DEBUG'] = True
     app.config['SECRET_KEY'] = 'abcdefghijklmnopqrstuvwxyz'
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
     app.config['SECURITY_PASSWORD_SALT'] = 'password-salt'
-    app.config['SECURITY_TOKEN_AUTHENTICATION_HEADER'] = 'Authentication-Token'
-
+    
+    # Configure Token
+    app.config['SECURITY_TOKEN_AUTHENTICATION_HEADER'] = "Authentication-Token"
+    app.config['SECURITY_TOKEN_MAX_AGE'] = 3600
+    app.config['SECURITY_LOGIN_WITHOUT_CONFIRMATION'] = True
     # tell flask to use sql_alchemy db
     db.init_app(app)
 
@@ -41,4 +45,4 @@ def create_app():
 
 if __name__ == '__main__':
     app = create_app()
-    app.run(debug=True)
+    app.run()

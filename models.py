@@ -17,7 +17,7 @@ class User(db.Model, UserMixin):
     description = db.Column(db.String)
     service_type = db.Column(db.String)
     Experience = db.Column(db.Integer, default=0)
-    active = db.Column(db.Boolean, default=True)
+    active = db.Column(db.Boolean, default=False)
     fs_uniquifier = db.Column(db.String, nullable=False)
     # Relationship
     roles = db.relationship('Role', secondary = 'user_roles')

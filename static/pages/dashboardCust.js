@@ -15,7 +15,7 @@ const dashboardCust = {
   async mounted() {
     const res = await fetch(window.location.origin + "/api/resources", {
       headers: {
-        "Authentication-Token": localStorage.getItem("token"),
+        "Authentication-Token": sessionStorage.getItem("token"),
       },
     });
     const data = await res.json();
