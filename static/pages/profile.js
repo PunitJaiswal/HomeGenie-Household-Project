@@ -1,11 +1,16 @@
 const profile = {
     template : `
     <div>
-        <h1> This is profile page </h1>
-        <router-link to="/dashboardCust">Instructor Dashboard</router-link>
-        <router-link to="/dashboardProf">Student Dashboard</router-link>
+        <h3> Welcome {{email}}, having role {{role}} </h3>
     </div>
-    `
+    `,
+    data(){
+        return{
+            email : sessionStorage.getItem('email'),
+            role : sessionStorage.getItem('role'),
+            id : sessionStorage.getItem('id'),
+        }
+    },
 };
 
 export default profile;

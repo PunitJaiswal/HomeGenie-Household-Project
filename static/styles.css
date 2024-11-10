@@ -2,3 +2,57 @@ body{
     background-color: lightcyan;
     text-align: center;
 }
+
+.dashboard{
+    width :95%;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.logo{
+width:60%;
+margin-top: 5vmin;}
+
+.login-box{
+background-color:lightgrey;
+width:40%;
+text-align:center;
+border-radius:5vmin;
+padding-top:5vmin;
+padding-bottom: 5vmin}
+
+.input-box{
+background-color: ivory;
+text-align: center;
+width: 30vmin;
+height:3.5vmin;
+border: 1px solid black;
+border-radius: 5vmin;
+box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
+padding-bottom: 5v;
+}
+
+.reg-btn{
+        height: 5vmin;
+        width: 25vmin;
+        cursor: pointer;
+        border-radius: 2vmin;
+        background-color: ivory;
+        border: 1px solid black;
+        margin-bottom: 5vmin;
+        margin-left: 3vmin;
+        margin-right: 3vmin;
+}
+
+.submit{
+    color: black;
+    background-color: lightgreen;
+    margin: 2vmin;
+    height:4vmin;
+    width: auto;
+    padding-left: 2vmin;
+    padding-right: 2vmin;
+    cursor: pointer;
+    border-radius: 2vmin;
+    border: 1px solid black;
+}

@@ -2,24 +2,34 @@ import router from "../utils/router.js"
 
 const signup = {
     template : `
-        <div class="signup-page">
+    <div class='dashboard'>
+        <div class='logo'>
+            <h1>HomeGenie</h1>
+            <img src="/static/images/logo.png" alt="logo" width="500" height="500">
+        </div>
+        <div class="login-box">
             <h1>Signup Page</h1>
-            <p>Email</p>
-            <input v-model="email" type="email" placeholder="Enter Email" required />
-            <p>Name</p>
-            <input v-model="name" type="name" placeholder="Enter Name" required />
-            <p>Username</p>
-            <input v-model="username" type="username" placeholder="Enter Username" required />
-            <p>Password</p>
-            <input v-model="password" type="password" placeholder="Enter Password" required />
+            <h3>Email</h3>
+            <input class='input-box' v-model="email" type="email" placeholder="Enter Email" required />
+            <h3>Name</h3>
+            <input class='input-box' v-model="name" type="name" placeholder="Enter Name" required />
+            <h3>Username</h3>
+            <input class='input-box' v-model="username" type="username" placeholder="Enter Username" required />
+            <h3>Password</h3>
+            <input class='input-box' v-model="password" type="password" placeholder="Enter Password" required />
             <br/></br>
-            <label for="roles">Choose your Role:</label>
-            <select v-model="role">
+            <h3>Choose your Role:</h3>
+            <select class='input-box' v-model="role">
                 <option value="professional">Professional</option>
                 <option value="customer">Customer</option>
             </select>
-            <button @click="submitInfo">Signup</button>
+            <br><br>
+            <button class='submit' @click="submitInfo">Signup</button>
+            <p> Already Registered?
+                <router-link to='/login'>Login</router-link>
+            </p>
         </div>
+    </div>
     `,
     data () {
         return {
@@ -59,6 +69,7 @@ const signup = {
             }
         },
     },
+
 };
 
 

@@ -117,6 +117,26 @@ def create_view(app: Flask, user_datastore : SQLAlchemySessionUserDatastore, db)
         all_users = user_datastore.user_model().query.all()
         # Filter user to get only inactive professionals
         inactive_profs = [user for user in all_users if not user.active and any(role.name=='professional' for role in user.roles)]
-        results = [{'id':user.id, 'name':user.name}
+        results = [{'id':user.id, 'name':user.name, 'email':user.email}
                    for user in inactive_profs]
+        return jsonify(results), 200
+    
+    # Endpoint to get all professionals
+    @app.route('/all-prof-list')
+    @roles_accepted('admin')
+    def all_prof_list():
+        all_users = user_datastore.user_model().query.all()
+        all_users = [user for user in all_users if any(role.name=='professional' for role in user.roles)]
+        results = [{'id':user.id, 'name':user.name, 'email':user.email}
+                   for user in all_users]
+        return jsonify(results), 200
+    
+    # Endpoint to get all customers
+    @app.route('/all-cust-list')
+    @roles_accepted('admin')
+    def all_cust_list():
+        all_users = user_datastore.user_model().query.all()
+        all_custs = [user for user in all_users if any(role.name=='customer' for role in user.roles)]
+        results = [{'id':user.id, 'name':user.name, 'email':user.email}
+                   for user in all_custs]
         return jsonify(results), 200

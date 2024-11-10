@@ -1,7 +1,7 @@
 const service = {
     template: `
       <div>
-          <div class="study-resource-card" @click="openPopup">
+          <div class="service-card" @click="openPopup">
               <div>
                   <h3>{{ name }}</h3>
                   <p>{{ description }}</p>
@@ -19,9 +19,8 @@ const service = {
             </div>
             <div>
                 <small> Base Price : {{ base_price }}</small>
-                <small> Time Required : {{ time_reuired }} hrs</small>
+                <small> Time Required : {{ time_required }} hrs</small>
             </div>
-            <button v-show='approvalRequired' @click="sendApproval">Approve</button>
             <button @click="closePopup">Close</button>
               </div>
           </div>
@@ -62,7 +61,7 @@ const service = {
       mounted() {
           const style = document.createElement("style");
           style.textContent = `
-          .study-resource-card {
+          .service-card {
               max-width: 600px;
               margin: auto;
               background-color : lightgrey;

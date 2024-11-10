@@ -16,7 +16,7 @@ class User(db.Model, UserMixin):
     date_created = db.Column(db.DateTime, default=datetime.utcnow)
     description = db.Column(db.String)
     service_type = db.Column(db.String)
-    Experience = db.Column(db.Integer, default=0)
+    experience = db.Column(db.Integer, default=0)
     active = db.Column(db.Boolean, default=False)
     fs_uniquifier = db.Column(db.String, nullable=False)
     # Relationship

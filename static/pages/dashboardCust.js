@@ -1,10 +1,10 @@
-import service from "../components/service.js";
+import Service from "../components/service.js";
 
 const dashboardCust = {
   template: `<div> 
             <h1>Student Dashboard</h1>
             <div v-for="service in allService">   
-                    <service :name="service.name" :description="service.description" :base_price="service.base_price" :time_required="service.time_required"/>
+                    <Service :name="service.name" :description="service.description" :base_price="service.base_price" :time_required="service.time_required"/>
             </div>
     </div>`,
   data() {
@@ -21,7 +21,7 @@ const dashboardCust = {
     const data = await res.json();
     this.allService = data;
   },
-  components: { service },
+  components: { Service },
 };
 
 export default dashboardCust;
