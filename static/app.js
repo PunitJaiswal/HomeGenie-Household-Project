@@ -13,6 +13,10 @@ new Vue({
     `,
     router,
     store,
+    created() {
+        // Initialize store state on app load
+        this.$store.commit('initializeStore');
+    },
     components : {
         Navbar,
     },
