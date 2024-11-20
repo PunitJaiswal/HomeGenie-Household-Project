@@ -32,7 +32,7 @@ const profile = {
                         </tr>
                         <tr v-if='user.roles=="professional"'>
                             <td>Service Type</td>
-                            <td>{{user.service_id}}</td>
+                            <td>{{user.service_type}}</td>
                         </tr>
                         <tr v-if='user.roles=="professional"'>
                             <td>Experience</td>
@@ -52,7 +52,7 @@ const profile = {
                         </tr>
                         <tr v-if='user.roles=="professional"'>
                             <td>Description</td>
-                            <td><a href="#">View Document</a></td>
+                            <td><a :href="user.description">View Document</a></td>
                         </tr>
                     </tbody>
                 </table>
@@ -114,7 +114,7 @@ const profile = {
                         </tr>
                         <tr v-if='user.roles=="professional"'>
                             <td>Description</td>
-                            <td><input class="input-file" @change="handleFileUpload($event, user)" type="file"></td>
+                            <td><input class="input-file" type="file" @change="handleFileUpload($event)"></td>
                         </tr>
                     </tbody>
                 </table>
@@ -134,6 +134,7 @@ const profile = {
             showViewForm: true,
             allServices:[],
             service_type: '',
+            description:"",
         }
     },
     methods : {
@@ -142,22 +143,57 @@ const profile = {
             this.showViewForm = false;
             this.showEditForm = true;        // Show the edit form
         },
-        async updateUser(user) {
-            const res = await fetch(window.location.origin + '/updateUser/' + user.id, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authentication-Token': sessionStorage.getItem('token'),
-                },
-                body: JSON.stringify(this.user)
-            });
-            if (res.ok) {
-                const updatedUser = await res.json();
-                this.showEditForm=false;
-                this.showViewForm=true;
+        handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                this.description = file;
+            } else {
+                this.description = null;
             }
         },
-    },
+        async updateUser(user) {
+            const formData = new FormData();
+        
+            // Append user fields to FormData
+            formData.append("name", user.name);
+            formData.append("email", user.email);
+            formData.append("username", user.username);
+            formData.append("location", user.location);
+            formData.append("pincode", user.pincode);
+            formData.append("contact", user.contact);
+        
+            if (user.roles === "professional") {
+                formData.append("service_id", user.service_id);
+                formData.append("experience", user.experience);
+        
+                // Append the file only if it's selected
+                if (this.description) {
+                    formData.append("description", this.description);
+                }
+            }
+        
+            try {
+                const res = await fetch(window.location.origin + '/updateUser/' + user.id, {
+                    method: 'PUT',
+                    headers: {
+                        'Authentication-Token': sessionStorage.getItem('token'),
+                    },
+                    body: formData,
+                });
+        
+                if (res.ok) {
+                    const updatedUser = await res.json();
+                    this.showEditForm = false;
+                    this.showViewForm = true;
+                    this.user = updatedUser; // Update the user object with the response data
+                } else {
+                    alert("Failed to update user. Please check the inputs.");
+                }
+            } catch (error) {
+                console.error("Error updating user:", error);
+            }
+        },
+    },        
     async mounted() {
         try {
             const userRes = await fetch(window.location.origin + '/viewUser/' + this.$route.params.id, {

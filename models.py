@@ -44,7 +44,7 @@ class UserRoles(db.Model):
     role_id = db.Column(db.Integer, db.ForeignKey('role.id'))
 
 
-class Service_request(db.Model):
+class ServiceRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     customer_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     service_id = db.Column(db.Integer, db.ForeignKey('service.id'), nullable=False)
@@ -52,7 +52,7 @@ class Service_request(db.Model):
     remarks = db.Column(db.String, nullable=False)
     date_of_request = db.Column(db.DateTime, default=datetime.utcnow)
     date_of_completion = db.Column(db.DateTime)
-    status = db.Column(db.String)
+    status = db.Column(db.String, default='Pending', nullable=False)
 
 class Review(db.Model):
     id = db.Column(db.Integer, primary_key=True)

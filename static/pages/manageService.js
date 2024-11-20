@@ -59,6 +59,7 @@ const manageService = {
                 <input class='input-box' type="number" v-model="newService.base_price" required /><br>
                 <h3 class="left-topic">Time Required (hr):</h3>
                 <input class='input-box' type="number" v-model="newService.time_required" required /><br><br>
+                <!--buttons-->
                 <button type="submit" class="accept_link">Update Service</button>
                 <button type="button" @click="showEditForm = false" class="reject_link">Cancel</button>
             </form>

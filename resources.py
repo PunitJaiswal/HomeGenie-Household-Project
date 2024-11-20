@@ -1,7 +1,7 @@
 from flask_restful import Resource, Api, fields, reqparse, marshal_with
 from flask_security import auth_required
 
-from models import Service, db, Service_request
+from models import Service, db, ServiceRequest
 
 api = Api(prefix='/api')
 
@@ -111,10 +111,10 @@ request_fields = {
     'remarks': fields.String
 }
 
-class ServiceRequest(Resource):
+class Service_Request(Resource):
     @marshal_with(request_fields)
     def get(self):
-        all_requests = Service_request.query.all()
+        all_requests = ServiceRequest.query.all()
         return all_requests, 200  # Include status code
     
     @auth_required('token')
@@ -133,7 +133,7 @@ class ServiceRequest(Resource):
         args = parser.parse_args()
 
         # Create a new service instance without specifying the id
-        request = Service_request(
+        request = ServiceRequest(
             professional_id = args.professional_id,
             customer_id = args.customer_id,
             service_id = args.service_id,
@@ -144,4 +144,4 @@ class ServiceRequest(Resource):
 
         return {'message': 'Service Created Successfully'}, 201 
     
-api.add_resource(ServiceRequest, '/requests')
+api.add_resource(Service_Request, '/requests')

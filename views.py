@@ -1,8 +1,11 @@
 from flask import render_template_string, render_template, request, Flask, jsonify
-from flask_security import auth_required, current_user, roles_required, roles_accepted
+from flask_security import auth_required, current_user, roles_required, roles_accepted, login_required
 from flask_security import SQLAlchemySessionUserDatastore
 from flask_security.utils import hash_password, verify_password
 from datetime import datetime
+import os
+from models import *
+from werkzeug.utils import secure_filename
 
 def create_view(app: Flask, user_datastore : SQLAlchemySessionUserDatastore, db):
     
@@ -35,87 +38,115 @@ def create_view(app: Flask, user_datastore : SQLAlchemySessionUserDatastore, db)
     # User Signup
     @app.route('/signup', methods=['POST'])
     def signup():
-        data = request.get_json()
-
-        email = data.get('email')
-        name = data.get('name')
-        password = data.get('password')
-        username = data.get('username')
-        role = data.get('role')
-        location = data.get('location')
-        pincode = data.get('pincode')
-        contact = data.get('contact')
-        if role=="professional":
-            description = data.get('description')
-            service_id = data.get('service_id')
-            experience = data.get('experience')
+        # Process form-data for file and text fields
+        email = request.form.get('email')
+        name = request.form.get('name')
+        password = request.form.get('password')
+        username = request.form.get('username')
+        role = request.form.get('role')
+        location = request.form.get('location')
+        pincode = request.form.get('pincode')
+        contact = request.form.get('contact')
+        description_file = request.files.get('description')  # Get file from request
+        service_id = request.form.get('service_id')
+        experience = request.form.get('experience')
+        description_path = None
+        if description_file:
+            # Save the file securely
+            filename = secure_filename(description_file.filename)
+            upload_folder = './static/upload_folder'
+            if not os.path.exists(upload_folder):
+                os.makedirs(upload_folder)
+            description_path = os.path.join(upload_folder, filename)
+            description_file.save(description_path)
 
         if not email or not password or not username or not name or role not in ['professional', 'customer']:
-            return jsonify({"status" : 'error' ,'message' : 'Invalid Input'}), 403
-        
+            return jsonify({"status": "error", "message": "Invalid Input"}), 403
         if user_datastore.find_user(email=email):
-            return jsonify({"status" : 'error' ,'message' : 'user already exists'}), 400
-        
+            return jsonify({"status": "error", "message": "User already exists"}), 400
+
         if role == 'professional':
-            user_datastore.create_user(email=email, 
-                                       password=hash_password(password), 
-                                       roles=['professional'],
-                                       active=False, 
-                                       username=username, 
-                                       name=name,
-                                       description=description,
-                                       service_id=service_id,
-                                       experience=experience,
-                                       location=location,
-                                       pincode=pincode,
-                                       contact=contact)
-            db.session.commit()
-            return jsonify({'status' : 'success', 'message' : 'Professional account successfully created'}), 201
+            user_datastore.create_user(
+                email=email,
+                password=hash_password(password),
+                roles=['professional'],
+                active=False,
+                username=username,
+                name=name,
+                description=description_path,
+                service_id=service_id,
+                experience=experience,
+                location=location,
+                pincode=pincode,
+                contact=contact
+            )
         elif role == 'customer':
-            user_datastore.create_user(email=email, 
-                                       password=hash_password(password), 
-                                       roles=['customer'], 
-                                       active=True, 
-                                       username=username, 
-                                       name=name,
-                                       location=location,
-                                       pincode=pincode,
-                                       contact=contact)
-            db.session.commit()
-            return jsonify({'status' : 'success', "message" : 'Customer account successfully created'}), 201
-        
-        return jsonify({'status': 'error', 'message' : 'invalid role'}), 400
+            user_datastore.create_user(
+                email=email,
+                password=hash_password(password),
+                roles=['customer'],
+                active=True,
+                username=username,
+                name=name,
+                location=location,
+                pincode=pincode,
+                contact=contact
+            )
+        db.session.commit()
+        return jsonify({'status': 'success', "message": "User successfully created"}), 201
     
 
     @app.route('/updateUser/<id>', methods=['PUT'])
+    @login_required
     @roles_accepted('professional', 'customer')
     def updateUser(id):
         user = user_datastore.find_user(id=id)
         if not user:
-            return jsonify({'status' : 'error', 'message' : 'user not present'}), 400
+            return jsonify({'status': 'error', 'message': 'User not present'}), 400
 
-        data = request.get_json()
-        print(data)
-        user.username = data.get('username')
-        user.name = data.get('name')
-        user.location = data.get('location')
-        user.pincode = data.get('pincode')
-        user.contact = data.get('contact')
-        user.date_crated = datetime.utcnow
-        if user.roles[0].name == 'professional':
-            user.description = data.get('description')
-            user.service_id = data.get('service_id')
-            user.experience = data.get('experience')
-        db.session.commit()
-        return jsonify({'status' : 'success', 'message' : 'user updated'}), 200
+        user.username = request.form.get('username') or user.username
+        user.name = request.form.get('name') or user.name
+        user.location = request.form.get('location') or user.location
+        user.pincode = request.form.get('pincode') or user.pincode
+        user.contact = request.form.get('contact') or user.contact
+        user.date_crated = datetime.utcnow()
+
+        # Debug log
+        print(f"User roles: {[role.name for role in user.roles]}")
+
+        if any(role.name == 'professional' for role in user.roles):
+            user.service_id = request.form.get('service_id') or user.service_id
+            user.experience = request.form.get('experience') or user.experience
+            print('Updating professional user')
+            description_file = request.files.get('description')
+            print(description_file)
+            if description_file:
+                filename = secure_filename(description_file.filename)
+                upload_folder = './static/upload_folder'
+                os.makedirs(upload_folder, exist_ok=True)
+                description_path = os.path.join(upload_folder, filename)
+                # Save file
+                print(f"Saving file to: {description_path}")
+                description_file.save(description_path)
+
+                # Update description field
+                user.description = description_path
+                print(f"Updated user description: {user.description}")
+
+        # Commit to database
+        try:
+            db.session.commit()
+            return jsonify({'status': 'success', 'message': 'User updated'}), 200
+        except Exception as e:
+            db.session.rollback()
+            print(f"Database commit failed: {e}")
+            return jsonify({'status': 'error', 'message': 'Database error'}), 500
 
 
 
-    
-
-    
     # Activate professional/Customer
     @app.route('/activate-user/<id>', methods=['GET'])
+    @login_required
     @roles_accepted('admin')
     def activate_user(id):
         user = user_datastore.find_user(id=id)
@@ -144,19 +175,12 @@ def create_view(app: Flask, user_datastore : SQLAlchemySessionUserDatastore, db)
         db.session.commit()
         return jsonify({'status' : 'success','message' : 'user is flagged'}), 200
     
-    # Endpoint to get inactive professionals
-    @app.route('/inactive-prof-list')
-    @roles_accepted('admin')
-    def inactive_prof_list():
-        all_users = user_datastore.user_model().query.all()
-        # Filter user to get only inactive professionals
-        inactive_profs = [user for user in all_users if not user.active and any(role.name=='professional' for role in user.roles)]
-        results = [{'id':user.id, 'name':user.name, 'email':user.email}
-                   for user in inactive_profs]
-        return jsonify(results), 200
     
+
+
     # Endpoint to get all professionals
     @app.route('/all-prof-list')
+    @login_required
     @roles_accepted('admin')
     def all_prof_list():
         all_users = user_datastore.user_model().query.all()
@@ -165,8 +189,19 @@ def create_view(app: Flask, user_datastore : SQLAlchemySessionUserDatastore, db)
                    for user in all_users]
         return jsonify(results), 200
     
+    @app.route('/active-prof-list')
+    @login_required
+    @roles_accepted('customer')
+    def active_prof_list():
+        all_users = user_datastore.user_model().query.filter(user_datastore.user_model.active).all()
+        all_users = [user for user in all_users if any(role.name=='professional' for role in user.roles)]
+        results = [{'id':user.id, 'name':user.name,'email':user.email, 'service_type':Service.query.get(user.service_id).name, 'active':user.active}
+                   for user in all_users]
+        return jsonify(results), 200
+    
     # Endpoint to get all customers
     @app.route('/all-cust-list')
+    @login_required
     @roles_accepted('admin')
     def all_cust_list():
         all_users = user_datastore.user_model().query.all()
@@ -176,6 +211,7 @@ def create_view(app: Flask, user_datastore : SQLAlchemySessionUserDatastore, db)
         return jsonify(results), 200
     
     @app.route('/viewUser/<id>', methods=['GET'])
+    @login_required
     @roles_accepted('admin', 'professional', 'customer')
     def viewUser(id):
         user = user_datastore.find_user(id=id)
@@ -190,12 +226,14 @@ def create_view(app: Flask, user_datastore : SQLAlchemySessionUserDatastore, db)
         'contact': user.contact if user.contact else "Not provided",
         'description': user.description if user.description else "Not provided",
         'service_id': user.service_id if user.service_id else "Not provided",
+        'service_type': Service.query.get(user.service_id).name if user.service_id else "Not provided",
         'experience': user.experience if user.experience else "Not provided",
         'roles': user.roles[0].name if user.roles else "No roles assigned",
         'date_crated':user.date_created})
     
 
     @app.route('/viewServiceProf/<id>', methods=['GET'])
+    @login_required
     @roles_accepted('customer')
     def viewServiceProf(id):
         allUsers = user_datastore.user_model.query.filter(user_datastore.user_model.service_id == id).all()

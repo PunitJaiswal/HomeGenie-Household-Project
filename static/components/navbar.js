@@ -10,7 +10,7 @@ const navbar = {
         <router-link v-if='state.loggedIn && state.role === "admin"' to='/statsAdmin'> Stats </router-link>
         <router-link v-if='state.loggedIn && state.role === "customer"' to='/statCust'> Stats </router-link>
         <router-link v-if='state.loggedIn && state.role === "professional"' to='/statsProf'> Stats </router-link>
-        <router-link v-if='state.loggedIn && state.role === "customer"' to='/search_service'><i class="fa-solid fa-magnifying-glass"></i> Search </router-link>
+        <router-link v-if='state.loggedIn && state.role === "customer"' to='/searchProf'><i class="fa-solid fa-magnifying-glass"></i> Search </router-link>
         <router-link v-if="state.loggedIn && !(state.role === 'admin')" :to="'/profile/' + state.id"><i class="fa-solid fa-user"></i> Profile</router-link>
         <button v-if="state.loggedIn" @click="logout">Logout</button>
         </div>

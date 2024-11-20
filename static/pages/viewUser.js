@@ -3,7 +3,8 @@ const viewUser = {
     <div class='dashboard'>
         <div class='container'>
             <div class="view_box">
-                <h1 style="color: maroon; text-align: center; text-decoration: underline;">Campaign</h1>
+                <h2 v-if="user.roles == 'professional'" style="color: maroon; text-align: center; text-decoration: underline;">Professional</h2>
+                <h2 v-if="user.roles == 'customer'" style="color: maroon; text-align: center; text-decoration: underline;">Customer</h2>
                 <br>
                 <table class="view_table">
                     <thead>
@@ -27,8 +28,8 @@ const viewUser = {
                             <td>{{user.date_crated}}</td>
                         </tr>
                         <tr v-if='user.roles=="professional"'>
-                            <td>Service Id</td>
-                            <td>{{user.service_id}}</td>
+                            <td>Service Type</td>
+                            <td>{{user.service_type}}</td>
                         </tr>
                         <tr v-if='user.roles=="professional"'>
                             <td>Experience</td>
@@ -48,7 +49,7 @@ const viewUser = {
                         </tr>
                         <tr v-if='user.roles=="professional"'>
                             <td>Description</td>
-                            <td><a href="#">View Document</a></td>
+                            <td><a :href="user.description">View Document</a></td>
                         </tr>
                     </tbody>
                 </table>

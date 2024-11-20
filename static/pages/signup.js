@@ -53,7 +53,7 @@ const signup = {
                             <input class='input-box' type='text' v-model='contact' placeholder='Enter Location'>
                         </p><br>
                         <p class="sub-heading">
-                            Description:<input class="input-file" type="file" placeholder="Upload your work description">
+                            Description:<input class="input-file" type="file" @change="handleFileUpload($event)">
                         </p><br>
                     </div>
                     <div v-if="role ==='customer'">
@@ -64,7 +64,7 @@ const signup = {
                             <input class='input-box' type='text' v-model='pincode' placeholder='Enter Pincode'>
                         </p><br>
                         <p class='sub-heading'>Contact No. : 
-                            <input class='input-box' type='text' v-model='contact' placeholder='Enter Contact No.'>
+                            <input class='input-box' v-model='contact' type='text' placeholder='Enter Contact No.'>
                         </p><br>
                     </div>
                     <button class='submit-btn' @click="submitInfo">Signup</button>
@@ -97,39 +97,53 @@ const signup = {
         };
     },
     methods : {
+        handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                this.description = file; // Store the file object
+            } else {
+                this.description = null; // Clear file if nothing is selected
+            }
+        },
         async submitInfo() {
+            const formData = new FormData();
+        
+            // Append all text data
+            formData.append('email', this.email);
+            formData.append('password', this.password);
+            formData.append('role', this.role);
+            formData.append('name', this.name);
+            formData.append('username', this.username);
+            formData.append('service_id', this.service_id);
+            formData.append('experience', this.experience);
+            formData.append('location', this.location);
+            formData.append('pincode', this.pincode);
+            formData.append('contact', this.contact);
+        
+            // Append the file
+            if (this.description) {
+                formData.append('description', this.description); // Attach the file
+            }
+        
             const url = window.location.origin;
             const res = await fetch(url + '/signup', {
-                method : 'POST',
-                headers: {
-                    "Content-Type" : 'application/json',
-                },
-                body : JSON.stringify({
-                    email : this.email,
-                    password : this.password,
-                    role : this.role,
-                    name : this.name,
-                    username : this.username,
-                    description: this.description,
-                    service_id: this.service_id,
-                    experience: this.experience,
-                    location: this.location,
-                    pincode: this.pincode,
-                    contact: this.contact,
-                }),
-                credentials : 'same-origin',
+                method: 'POST',
+                body: formData, // Send as multipart/form-data
+                credentials: 'same-origin', // Ensure cookies are sent if needed
             });
-            
+        
             if (res.ok) {
                 const data = await res.json();
                 console.log(data);
-                router.push('login');
-            }
-            else{
+                router.push('login'); // Redirect to login page on success
+            } else {
                 const errorData = await res.json();
-                console.error('signup failed', errorData)
+                console.error('Signup failed', errorData);
+                this.status = 'error';
+                this.message = errorData.message;
             }
         },
+        
     },
     async mounted() {
         try {

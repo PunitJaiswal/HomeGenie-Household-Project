@@ -9,6 +9,7 @@ import dashboardProf from '../pages/dashboardProf.js';
 import manageService from '../pages/manageService.js';
 import viewUser from '../pages/viewUser.js';
 import viewServiceProf from '../pages/viewServiceProf.js';
+import searchProf from '../pages/searchProf.js';
 
 const routes = [
     {path : '/', component : home},
@@ -21,7 +22,8 @@ const routes = [
     {path : '/dashboardProf', component : dashboardProf},
     {path : '/manageService', component : manageService},
     {path : '/viewUser/:id', component : viewUser},
-    {path : '/viewServiceProf/:id', component : viewServiceProf}
+    {path : '/viewServiceProf/:id', component : viewServiceProf},
+    {path : '/searchProf', component : searchProf},
 ]
 
 const router = new VueRouter({
