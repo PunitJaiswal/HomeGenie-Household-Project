@@ -46,7 +46,7 @@ const dashboardCust = {
                     <td class="pending-word" v-if="req.status ==='Pending'">{{req.status}}</td>
                     <td class="rejected-word" v-if="req.status ==='Rejected'">{{req.status}}</td>
                     <td class="accepted-word" v-if="req.status ==='Accepted'">{{req.status}}</td>
-                    <td class="completed-word" v-if="req.status ==='Completed'"><h3>{{req.status}}</h3></td>
+                    <td class="completed-word" v-if="req.status ==='Closed'"><h3>{{req.status}}</h3></td>
                     <td>
                         <button class="view_link" v-if="req.status === 'Pending'" @click="openEditForm(req)">Edit</button>
                         <button class="reject_link" v-if="req.status === 'Pending'" @click="deleteRequest(req)">Cancel</button>

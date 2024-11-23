@@ -33,8 +33,7 @@ const searchProf = {
                     <td>{{prof.pincode}}</td>
                     <td>
                         <button class="view_link" @click="openViewForm(prof.id)">View</button> 
-                        <button class="accept_link" @click="sendApproval(prof.id)" v-if="!prof.active">Activate</button>
-                        <button class="reject_link" @click="flagUser(prof.id)" v-if="prof.active">Flag</button>
+                        <button class="accept_link" @click="openAddForm(prof)">Request</button>
                     </td>
                 </tr>
             </tbody>
@@ -94,6 +93,21 @@ const searchProf = {
             <button class="back_link" @click="showViewForm = false">Back</button>
             <br><br>
         </div>
+        <div v-if="showAddForm" class="add_service_form">
+            <h2><u>Add New Service</u></h2><br>
+            <form @submit.prevent="sendRequest">
+                <p class="left-topic"><strong>Professional Name : </strong>{{prof.name}}</p>
+                <input class='input-box' type="text" :value="prof.id" readonly hidden/><br>
+                <p class="left-topic"><strong>Service Name :</strong>{{prof.service_type}}</p>
+                <input class='input-box' type="text" :value="prof.service_id" readonly hidden/><br>
+                <h3 class="left-topic">Message :</h3>
+                <input class='input-box' type="text" v-model="newRequest.remarks" required/>
+                <br><br>
+                <!-- Buttons -->
+                <button type="submit" class="accept_link">Create Request</button>
+                <button type="button" @click="showAddForm = false" class="reject_link">Cancel</button>
+            </form>
+        </div>
     </div>
     `,
     data() {
@@ -105,6 +119,13 @@ const searchProf = {
             location:"",
             pincode:"",
             user:{},
+            newRequest:{
+                service_id: null,
+                professional_id: null,
+                customer_id: null,
+                remarks: '',
+            },
+            showAddForm: false,
             showViewForm: false
         };
     },
@@ -132,7 +153,42 @@ const searchProf = {
             } finally {
                 this.isLoading = false; // Set loading state to false
             }
-        },  
+        },
+        openAddForm(prof) {
+            this.showAddForm = true;
+            this.prof = prof;
+        },
+        async sendRequest() {
+            // Populate the newRequest object with the relevant values
+            this.newRequest.professional_id = this.prof.id;
+            this.newRequest.service_id = this.service.id;
+            this.newRequest.remarks = this.newRequest.remarks || '';
+            this.newRequest.customer_id = this.customer.id;
+    
+            const response = await fetch(`${window.location.origin}/api/requests`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authentication-Token': sessionStorage.getItem('token'),
+                },
+                body: JSON.stringify(this.newRequest),
+            });
+    
+            if (response.ok) {
+                const result = await response.json();
+                alert(result.message || 'Request sent successfully!');
+    
+                // Mark the professional as requested (optional if needed in UI)
+                const prof = this.allServiceProfs.find(prof => prof.id === this.prof.id);
+                if (prof) prof.requested = true;
+    
+                // Close the form after successful submission
+                this.showAddForm = false;
+            } else {
+                const error = await response.json();
+                alert(error.message || 'Failed to send request.');
+            }
+        },
         async searchProf() {
             this.status = ""; // Clear previous status
             this.message = ""; // Clear previous messages

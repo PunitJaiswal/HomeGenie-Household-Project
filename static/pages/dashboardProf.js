@@ -25,9 +25,10 @@ const dashboardProf = {
                     <td>
                         <button v-if="request.status === 'Pending'" class="accept_link" @click="acceptRequest(request.id)" >Accept</button>
                         <button v-if="request.status === 'Pending'" class="reject_link" @click="rejectRequest(request.id)" >Reject</button>
-                        <h3 class="completed-word" v-if="request.status == 'Completed'">{{request.status}}</h3>
+                        <h3 class="completed-word" v-if="request.status == 'Closed'">{{request.status}}</h3>
+                        <h3 class="accepted-word" v-if="request.status == 'Accepted'">{{request.status}}</h3>
                     </td>
-                    <td v-if="request.status === 'Completed'">{{request.rating}}</td>
+                    <td v-if="request.status === 'Closed'">{{request.rating}}</td>
                     <td v-else>Not Provided yet</td>
                 </tr>
             </tbody>

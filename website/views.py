@@ -1,19 +1,35 @@
-from flask import render_template_string, render_template, request, Flask, jsonify
-from flask_security import auth_required, current_user, roles_required, roles_accepted, login_required
+from flask import render_template, request, Flask, jsonify, send_file
+from flask_security import roles_accepted, login_required
 from flask_security import SQLAlchemySessionUserDatastore
 from flask_security.utils import hash_password, verify_password
 from datetime import datetime
 import os
 from website.models import *
 from werkzeug.utils import secure_filename
+from website.celery.tasks import create_csv
+from celery.result import AsyncResult
 
-def create_view(app: Flask, user_datastore : SQLAlchemySessionUserDatastore, db):
-    
+def create_view(app: Flask, user_datastore : SQLAlchemySessionUserDatastore, db, cache):
+
     # Homepage
     @app.route('/')
     def home():
         return render_template('index.html')
     
+    @app.get('/create-service-request')
+    def createCSV():
+        task = create_csv.delay()
+        return {'task_id' : task.id}, 200
+    
+    @app.get('/get-service-request/<task_id>')
+    def getCSV(task_id):
+        result = AsyncResult(task_id)
+        if result.ready():
+            return send_file(f'./website/celery/user-downloads/{result.result}')
+        else:
+            return {'message' : 'Task not ready'}
+
+
     # User Login
     @app.route('/user-login', methods=['POST'])
     def user_login():
@@ -146,6 +162,7 @@ def create_view(app: Flask, user_datastore : SQLAlchemySessionUserDatastore, db)
 
     # Activate professional/Customer
     @app.route('/activate-user/<id>', methods=['GET'])
+    @cache.memoize(timeout=5)
     @login_required
     @roles_accepted('admin')
     def activate_user(id):
@@ -163,6 +180,7 @@ def create_view(app: Flask, user_datastore : SQLAlchemySessionUserDatastore, db)
     # Flag professional/Customer
     @app.route('/flag-user/<id>', methods=['GET'])
     @roles_accepted('admin')
+    @cache.memoize(timeout=5)
     def flag_user(id):
         user = user_datastore.find_user(id=id)
         if not user:
@@ -182,6 +200,7 @@ def create_view(app: Flask, user_datastore : SQLAlchemySessionUserDatastore, db)
     @app.route('/all-prof-list')
     @login_required
     @roles_accepted('admin')
+    @cache.cached(timeout=30)
     def all_prof_list():
         all_users = user_datastore.user_model().query.all()
         all_users = [user for user in all_users if any(role.name=='professional' for role in user.roles)]
@@ -192,6 +211,7 @@ def create_view(app: Flask, user_datastore : SQLAlchemySessionUserDatastore, db)
     @app.route('/active-prof-list')
     @login_required
     @roles_accepted('customer')
+    @cache.cached(timeout=5)
     def active_prof_list():
         all_users = user_datastore.user_model().query.filter(user_datastore.user_model.active).all()
         all_users = [user for user in all_users if any(role.name=='professional' for role in user.roles)]
@@ -203,6 +223,7 @@ def create_view(app: Flask, user_datastore : SQLAlchemySessionUserDatastore, db)
     @app.route('/all-cust-list')
     @login_required
     @roles_accepted('admin')
+    @cache.cached(timeout=5)
     def all_cust_list():
         all_users = user_datastore.user_model().query.all()
         all_custs = [user for user in all_users if any(role.name=='customer' for role in user.roles)]
@@ -213,6 +234,7 @@ def create_view(app: Flask, user_datastore : SQLAlchemySessionUserDatastore, db)
     @app.route('/viewUser/<id>', methods=['GET'])
     @login_required
     @roles_accepted('admin', 'professional', 'customer')
+    @cache.memoize(timeout=30)
     def viewUser(id):
         user = user_datastore.find_user(id=id)
         return jsonify({
@@ -236,6 +258,7 @@ def create_view(app: Flask, user_datastore : SQLAlchemySessionUserDatastore, db)
     @app.route('/viewServiceProf/<id>', methods=['GET'])
     @login_required
     @roles_accepted('customer')
+    @cache.memoize(timeout=30)
     def viewServiceProf(id):
         allUsers = user_datastore.user_model.query.filter(user_datastore.user_model.service_id == id).all()
         results = [{'id':user.id, 'name':user.name, 'email':user.email, 'active':user.active, 'location':user.location, 'pincode':user.pincode, 'contact':user.contact, 'description':user.description, 'rating':user.rating, 'service_id':user.service_id, 'experience':user.experience}
@@ -354,6 +377,7 @@ def create_view(app: Flask, user_datastore : SQLAlchemySessionUserDatastore, db)
     @app.route('/customer/viewProf/<id>', methods=['GET'])
     @login_required
     @roles_accepted('customer')
+    @cache.memoize(timeout=30)
     def viewProf(id):
         user = user_datastore.find_user(id=id)
         return jsonify({

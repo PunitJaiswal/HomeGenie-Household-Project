@@ -28,8 +28,14 @@ const manageService = {
         </table>
         <h3 v-if="!allServices.length">No Service registered yet</h3>
         <br><br>
-
         <p class="add_logo" v-if="!showAddForm" @click="showAddForm = true"><i class="fa-solid fa-circle-plus"></i></p>
+        
+        <div style="text-align:left;">
+            <h2><u>Get All Service Requests</u></h2>
+            <br>
+            <button class='accept_link' @click='getServiceRequest'>Get CSV File</button>
+        </div>
+
         <!-- Add Service Form -->
         <div v-if="showAddForm" class="add_service_form">
             <h2><u>Add New Service</u></h2><br>
@@ -136,7 +142,26 @@ const manageService = {
                 alert('Error: ' + (error.message || 'Failed to delete service'));
             }
         },
-        
+        async getServiceRequest() {
+            const res = await fetch(window.location.origin + '/create-service-request', {
+                headers: {
+                    'Authentication-Token': sessionStorage.getItem('token'),
+                },
+            });
+            const task_id = (await res.json()).task_id
+
+            const interval = setInterval(async() => {
+                const res = await fetch(window.location.origin + '/get-service-request/' + task_id, {
+                    headers: {
+                        'Authentication-Token': sessionStorage.getItem('token'),
+                    },
+                });
+                if (res.ok) {
+                    window.open(`${window.location.origin}/get-service-request/${task_id}`);
+                    clearInterval(interval);
+                }
+            }, 100);
+        }
     },
     async mounted() {
         const response = await fetch(window.location.origin + '/api/services', {

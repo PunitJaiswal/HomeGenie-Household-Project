@@ -1,9 +1,11 @@
 from flask_restful import Resource, Api, fields, reqparse, marshal_with
 from flask_security import auth_required, roles_required
 from website.models import Service, db, ServiceRequest, User, Review
+from flask import current_app as app
 import datetime
 
 api = Api(prefix='/api')
+cache = app.cache
 
 # Define fields for response serialization
 service_fields = {
@@ -16,7 +18,7 @@ service_fields = {
 
 class Services(Resource):
     @marshal_with(service_fields)
-    @auth_required('token')
+    @cache.cached(timeout=5)
     def get(self):
         all_services = Service.query.all()
         return all_services, 200  # Include status code
@@ -85,6 +87,7 @@ class updateService(Resource):
 
 class getService(Resource):
     @marshal_with(service_fields)
+    @cache.memoize(timeout=5)
     def get(self, service_id):
         service = Service.query.get(service_id)
         return service
@@ -115,6 +118,7 @@ request_fields = {
 class Service_Request(Resource):
     @marshal_with(request_fields)
     @auth_required('token')
+    @cache.cached(timeout=5)
     def get(self):
         all_requests = ServiceRequest.query.all()
         return all_requests, 200  # Include status code
@@ -178,6 +182,7 @@ class updateRequest(Resource):
 class ServiceRequestbyCustomer(Resource):
     @auth_required('token')
     @roles_required('customer')
+    @cache.memoize(timeout=5)
     def get(self, customer_id):
         allrequests = ServiceRequest.query.filter_by(customer_id=customer_id).all()
         result = [{
@@ -200,6 +205,7 @@ class ServiceRequestbyCustomer(Resource):
 class ServiceRequestbyProfessional(Resource):
     @auth_required('token')
     @roles_required('professional')
+    @cache.memoize(timeout=5)
     def get(self, professional_id):
         allrequests = ServiceRequest.query.filter_by(professional_id=professional_id).all()
         result = [{
@@ -273,8 +279,11 @@ class ReviewResource(Resource):
         )
         request = ServiceRequest.query.filter_by(customer_id=args['customer_id'], professional_id=args['professional_id']).first()
         prof = User.query.filter_by(id=args['professional_id']).first()
-        prof.rating = (prof.rating + args['rating'])/2
-        request.status = 'Completed'
+        if prof.rating:
+            prof.rating = (prof.rating + args['rating'])/2
+        else:
+            prof.rating = args['rating']
+        request.status = 'Closed'
         request.date_of_completion = datetime.datetime.now()
         db.session.add(review)
         db.session.commit()
@@ -282,6 +291,7 @@ class ReviewResource(Resource):
     
 class ReviewByProfessional(Resource):
     @auth_required('token')
+    @cache.memoize(timeout=5)
     def get(self, professional_id):
         allReviews = Review.query.filter_by(professional_id=professional_id).all()
         result = [{

@@ -126,7 +126,8 @@ const profile = {
             </div>
             <div v-if="user.roles=='professional'" class='review-box'>
                 <h2>All Reviews</h2><br>
-                <p><strong>Overall Rating: </strong>{{user.rating}} ★</p>
+                <p v-if="allReview.length"><strong>Overall Rating: </strong>{{user.rating}} ★</p>
+                <p v-else>No Reviews</p>
                 <div class="review" v-for="review in allReview" :key="review.id">
                     <p>{{review.review}}</p>
                     <p><strong>Rating: </strong>{{review.rating}} ★</p>
