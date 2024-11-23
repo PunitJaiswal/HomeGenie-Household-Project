@@ -23,7 +23,7 @@ const viewServiceProf = {
                     <td>{{prof.location}}</td>
                     <td>{{prof.rating || "Not Rated"}}</td>
                     <td>
-                        <button class="view_link" @click="viewUser(prof.id)">View</button>
+                        <button class="view_link" @click="openViewForm(prof.id)">View</button>
                         <button class="accept_link" @click="openAddForm(prof)">Request</button>
                     </td>
                 </tr>
@@ -47,6 +47,59 @@ const viewServiceProf = {
                 <button type="button" @click="showAddForm = false" class="reject_link">Cancel</button>
             </form>
         </div>
+        <div v-if="showViewForm" class="add_service_form">
+            <h2 style="color: maroon; text-align: center; text-decoration: underline;">Professional</h2>
+            <br>
+            <table class="view_table">
+                <thead>
+                    <tr>
+                        <th><h3>Professional Details</h3></th>
+                        <th><h3>Information</h3></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Name</td>
+                        <td>{{user.name}}</td>
+                    </tr>
+                    <tr>
+                        <td>Email</td>
+                        <td>{{user.email}}</td>
+                    </tr>
+                    <tr>
+                        <td>Date Created</td>
+                        <td>{{user.date_created}}</td>
+                    </tr>
+                    <tr v-if='user.roles=="professional"'>
+                        <td>Service Type</td>
+                        <td>{{user.service_type}}</td>
+                    </tr>
+                    <tr v-if='user.roles=="professional"'>
+                        <td>Experience</td>
+                        <td>{{user.experience}}</td>
+                    </tr>
+                    <tr>
+                        <td>Location</td>
+                        <td>{{user.location}}</td>
+                    </tr>
+                    <tr>
+                        <td>Pincode</td>
+                        <td>{{user.pincode}}</td>
+                    </tr>
+                    <tr>
+                        <td>Contact</td>
+                        <td>{{user.contact}}</td>
+                    </tr>
+                    <tr>
+                        <td>Description</td>
+                        <td><a :href="user.description">View Document</a></td>
+                    </tr>
+                </tbody>
+            </table>
+            <br><br>
+            <button class="back_link" @click="showViewForm = false">Back</button>
+            <br><br>
+        </div>
     </div>
     `,
 
@@ -63,6 +116,8 @@ const viewServiceProf = {
                 customer_id: null,
                 remarks: '',
             },
+            user:{},
+            showViewForm: false
         };
     },
     methods: {
@@ -99,6 +154,19 @@ const viewServiceProf = {
             } else {
                 const error = await response.json();
                 alert(error.message || 'Failed to send request.');
+            }
+        },
+        async openViewForm(id) {
+            const userRes = await fetch(window.location.origin + '/customer/viewProf/' + id, {
+                headers: {
+                  'Authentication-Token': sessionStorage.getItem('token')
+                },
+            });
+            if (userRes.ok) {
+              this.user = await userRes.json();
+              this.showViewForm = true; // Open the view form once data is loaded
+            } else {
+              alert("Failed to load user data");
             }
         },
         

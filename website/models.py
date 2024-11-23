@@ -14,7 +14,23 @@ class Service(db.Model):
     base_price = db.Column(db.Integer, nullable=False)
     time_required = db.Column(db.Integer)
 
+class Role(db.Model, RoleMixin):
+    __tablename__ = 'role'
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(80), unique=True)
+    description = db.Column(db.String(255))
+
+
+class UserRoles(db.Model):
+    __tablename__ = 'user_roles'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))  # Match the case of the table name
+    role_id = db.Column(db.Integer, db.ForeignKey('role.id'))
+
+
+
 class User(db.Model, UserMixin):
+    __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String, nullable=False, unique=True)
     username = db.Column(db.String, nullable=False, unique=True)
@@ -28,20 +44,11 @@ class User(db.Model, UserMixin):
     location = db.Column(db.String)
     pincode = db.Column(db.String)
     contact = db.Column(db.String)
-    rating = db.Column(db.Integer, default=0, nullable=False)
+    rating = db.Column(db.Integer)
     service_id = db.Column(db.Integer, db.ForeignKey('service.id'))
     # Relationship
-    roles = db.relationship('Role', secondary='user_roles')
+    roles = db.relationship('Role', secondary='user_roles', backref=db.backref('User', lazy='dynamic'))
 
-class Role(db.Model, RoleMixin):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, unique=True)
-    description = db.Column(db.String)
-
-class UserRoles(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    role_id = db.Column(db.Integer, db.ForeignKey('role.id'))
 
 
 class ServiceRequest(db.Model):

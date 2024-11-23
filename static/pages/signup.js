@@ -28,14 +28,16 @@ const signup = {
                         <input class='input-box' v-model="password" type="password" placeholder="Enter Password" required />
                     </p><br>
                     <p class='sub-heading'>Choose your Role : 
-                        <select class='input-box' v-model="role" placeholder="Select Role">
-                            <option value="professional">Professional</option>
-                            <option value="customer">Customer</option>
-                        </select>
+                    <select v-model="role" class='input-box'>
+                        <option value="" disabled selected>Select Role</option>
+                        <option value="professional">Professional</option>
+                        <option value="customer">Customer</option>
+                    </select>
                     </p><br>
                     <div v-if="role ==='professional'">
                         <p class='sub-heading'>Service Type : 
-                            <select class='input-box' v-model="service_id" placeholder="Select Service Type">
+                            <select class='input-box' v-model="service_id">
+                                <option value="" disabled selected>Select Service Type</option>
                                 <option v-for="service in allServices" :key="service.id" :value="service.id">{{service.name}}</option>
                             </select>                    
                         </p>
@@ -50,7 +52,7 @@ const signup = {
                             <input class='input-box' type='text' v-model='pincode' placeholder='Enter Pincode'>
                         </p><br>
                         <p class='sub-heading'>Contact No. : 
-                            <input class='input-box' type='text' v-model='contact' placeholder='Enter Location'>
+                            <input class='input-box' type='text' v-model='contact' placeholder='Enter Contact No.'>
                         </p><br>
                         <p class="sub-heading">
                             Description:<input class="input-file" type="file" @change="handleFileUpload($event)">

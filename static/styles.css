@@ -167,6 +167,12 @@ h1{
     cursor: pointer;
 }
 
+.navbar h2{
+    font-size: 4vmin;
+    color: maroon;
+    text-decoration: underline;
+}
+
 .navbar button{
     padding: 1vmin 2vmin 1vmin 2vmin;
     margin-left: 5vmin;
@@ -273,7 +279,7 @@ td, th{
     text-align: center;
     padding: 3vmin;
     height: auto;
-    width: 60vmin;
+    width: 50%;
     border-radius: 1rem;
     background-color:#E1DEE3;
     box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
@@ -299,7 +305,7 @@ td, th{
 
 .items{
     background-color: white;
-    height:40vmin;
+    height:30vmin;
     width: 20%;
     padding: 2vmin;
     gap: 5%;
@@ -308,4 +314,99 @@ td, th{
     box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
     color:#1B2F33;
     background-color: #d8e2dc;
+}
+
+/* Style the star container */
+.rating-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 30px;
+    cursor: pointer;
+}
+
+textarea{
+    width:230px;   
+}
+
+.rating-container {
+    display: flex;
+    font-size: 2rem;
+    cursor: pointer;
+}
+
+.star {
+  color: black; /* Default color for unfilled stars */
+  margin-right: 5px;
+  transition: color 0.3s ease;
+}
+
+.star.filled {
+  color: gold; /* Filled stars appear in golden color */
+}
+  
+
+.review-box{
+    background-color:#E1DEE3;
+    display: flex;
+    flex-direction: column;
+    padding: 3vmin;
+    height: auto;
+    width: 30%;
+    border-radius: 1rem;
+    box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
+    color:#1B2F33;
+}
+
+.review{
+    align-self: center;
+    background-color: #d8e2dc;
+    margin-top: 2vmin;
+    padding: 2vmin;
+    width: 60%;
+    border-radius: 2vmin;
+    border: none;
+    box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
+    color:#1B2F33;
+}
+
+.completed-word{
+    color: green;
+}
+
+.accepted-word{
+    color: violet;
+}
+
+.rejected-word{
+    color: red;
+}
+
+.pending-word{
+    color:darkkhaki;
+}
+
+.search-filter{
+    height: 10vmin;
+    margin-top: 3vmin;
+    display: flex; /* Use flexbox for layout */
+    justify-content: right; /* Gap between input boxes */
+}
+
+.search-filter input{
+    padding: 10px; 
+    width: 200px; 
+    box-sizing: border-box; 
+    border: 1px solid black; 
+    border-radius: 5px;
+    font-size: 13px; 
+}
+
+.search-filter select{
+    padding: 10px; 
+    width: 200px; 
+    box-sizing: border-box; 
+    border: 1px solid black; 
+    border-radius: 5px;
+    font-size: 13px; 
 }

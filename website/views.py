@@ -4,7 +4,7 @@ from flask_security import SQLAlchemySessionUserDatastore
 from flask_security.utils import hash_password, verify_password
 from datetime import datetime
 import os
-from models import *
+from website.models import *
 from werkzeug.utils import secure_filename
 
 def create_view(app: Flask, user_datastore : SQLAlchemySessionUserDatastore, db):
@@ -185,7 +185,7 @@ def create_view(app: Flask, user_datastore : SQLAlchemySessionUserDatastore, db)
     def all_prof_list():
         all_users = user_datastore.user_model().query.all()
         all_users = [user for user in all_users if any(role.name=='professional' for role in user.roles)]
-        results = [{'id':user.id, 'name':user.name, 'email':user.email, 'active':user.active}
+        results = [{'id':user.id, 'name':user.name, 'email':user.email, 'active':user.active, 'location':user.location, 'pincode':user.pincode, 'contact':user.contact, 'description':user.description, 'rating':user.rating, 'service_id':user.service_id, 'experience':user.experience, 'service_type':Service.query.get(user.service_id).name}
                    for user in all_users]
         return jsonify(results), 200
     
@@ -195,7 +195,7 @@ def create_view(app: Flask, user_datastore : SQLAlchemySessionUserDatastore, db)
     def active_prof_list():
         all_users = user_datastore.user_model().query.filter(user_datastore.user_model.active).all()
         all_users = [user for user in all_users if any(role.name=='professional' for role in user.roles)]
-        results = [{'id':user.id, 'name':user.name,'email':user.email, 'service_type':Service.query.get(user.service_id).name, 'active':user.active}
+        results = [{'id':user.id, 'name':user.name,'email':user.email, 'service_type':Service.query.get(user.service_id).name, 'location':user.location, "pincode":user.pincode, 'active':user.active}
                    for user in all_users]
         return jsonify(results), 200
     
@@ -206,7 +206,7 @@ def create_view(app: Flask, user_datastore : SQLAlchemySessionUserDatastore, db)
     def all_cust_list():
         all_users = user_datastore.user_model().query.all()
         all_custs = [user for user in all_users if any(role.name=='customer' for role in user.roles)]
-        results = [{'id':user.id, 'name':user.name, 'email':user.email, 'active':user.active}
+        results = [{'id':user.id, 'name':user.name, 'email':user.email, 'active':user.active, 'location':user.location, 'pincode':user.pincode, 'contact':user.contact, 'description':user.description, 'service_id':user.service_id, 'rating':user.rating}
                    for user in all_custs]
         return jsonify(results), 200
     
@@ -226,6 +226,7 @@ def create_view(app: Flask, user_datastore : SQLAlchemySessionUserDatastore, db)
         'contact': user.contact if user.contact else "Not provided",
         'description': user.description if user.description else "Not provided",
         'service_id': user.service_id if user.service_id else "Not provided",
+        'rating': user.rating if user.rating else "Not provided",
         'service_type': Service.query.get(user.service_id).name if user.service_id else "Not provided",
         'experience': user.experience if user.experience else "Not provided",
         'roles': user.roles[0].name if user.roles else "No roles assigned",
@@ -240,3 +241,132 @@ def create_view(app: Flask, user_datastore : SQLAlchemySessionUserDatastore, db)
         results = [{'id':user.id, 'name':user.name, 'email':user.email, 'active':user.active, 'location':user.location, 'pincode':user.pincode, 'contact':user.contact, 'description':user.description, 'rating':user.rating, 'service_id':user.service_id, 'experience':user.experience}
                    for user in allUsers]
         return jsonify(results), 200
+    
+    @app.route('/searchProf', methods=['POST'])
+    @login_required
+    @roles_accepted('customer', 'admin')
+    def searchProf():
+        # Get JSON data from the request body
+        data = request.get_json()
+        name = data.get('name')
+        location = data.get('location')
+        pincode = data.get('pincode')
+        
+        # Build the query dynamically
+        query = user_datastore.user_model.query
+        if name:
+            query = query.filter(user_datastore.user_model.name.ilike(f"%{name}%"))  # Case-insensitive match
+        if location:
+            query = query.filter(user_datastore.user_model.location.ilike(f"%{location}%"))
+        if pincode:
+            query = query.filter(user_datastore.user_model.pincode.like(f"%{pincode}%"))
+
+        # Filter for professionals only
+        matching_users = query.all()
+        professionals = [
+            user for user in matching_users if any(role.name == 'professional' for role in user.roles)
+        ]
+
+        # Handle no results
+        if not professionals:
+            return jsonify({'status': 'success', 'message': 'No professionals found matching the criteria'}), 404
+
+        # Serialize the results
+        results = [
+            {
+                'id': user.id,
+                'name': user.name,
+                'email': user.email,
+                'location': user.location,
+                'pincode': user.pincode,
+                'contact': user.contact,
+                'description': user.description,
+                'rating': user.rating,
+                'experience': user.experience,
+                'service_type': Service.query.get(user.service_id).name if user.service_id else "Not provided",
+                'active': user.active,
+            }
+            for user in professionals
+        ]
+
+        return jsonify({'status': 'success', 'results': results}), 200
+
+
+    @app.route('/searchUser', methods=['POST'])
+    @login_required
+    @roles_accepted('admin')
+    def searchuser():
+        data = request.get_json()    
+        name = data.get('name')
+        location = data.get('location')
+        pincode = data.get('pincode')
+        query = user_datastore.user_model.query 
+        if name:
+            query = query.filter(user_datastore.user_model.name.ilike(f"%{name}%"))  # Case-insensitive match
+        if location:
+            query = query.filter(user_datastore.user_model.location.ilike(f"%{location}%"))
+        if pincode:
+            query = query.filter(user_datastore.user_model.pincode.like(f"%{pincode}%"))
+        matching_users = query.all()
+
+        professionals = [user for user in matching_users if any(role.name == 'professional' for role in user.roles)]
+        customers = [user for user in matching_users if any(role.name == 'customer' for role in user.roles)]
+
+        # Serialize the results
+        professional_results = [
+            {
+                'id': user.id,
+                'name': user.name,
+                'email': user.email,
+                'location': user.location,
+                'pincode': user.pincode,
+                'contact': user.contact,
+                'description': user.description,
+                'rating': user.rating,
+                'experience': user.experience,
+                'service_type': Service.query.get(user.service_id).name if user.service_id else "Not provided",
+                'active': user.active,
+            }
+            for user in professionals
+        ]
+
+        customer_results = [
+            {
+                'id': user.id,
+                'name': user.name,
+                'email': user.email,
+                'location': user.location,
+                'pincode': user.pincode,
+                'contact': user.contact,
+                'description': user.description,
+                'active': user.active,
+            }
+            for user in customers
+        ]
+
+        # Return both professional and customer lists
+        return jsonify({
+            'status': 'success',
+            'professionals': professional_results,
+            'customers': customer_results
+        }), 200
+    
+    @app.route('/customer/viewProf/<id>', methods=['GET'])
+    @login_required
+    @roles_accepted('customer')
+    def viewProf(id):
+        user = user_datastore.find_user(id=id)
+        return jsonify({
+            'id': user.id,
+            'name': user.name if user.name else "Not provided",
+            'email': user.email,
+            'date_created': user.date_created,
+            'location': user.location if user.location else "Not provided",
+            'pincode': user.pincode if user.pincode else "Not provided",
+            'contact': user.contact if user.contact else "Not provided",
+            'description': user.description if user.description else "Not provided",
+            'rating': user.rating if user.rating else "Not provided",
+            'experience': user.experience if user.experience else "Not provided",
+            'service_type': Service.query.get(user.service_id).name if user.service_id else "Not provided",
+            'active': user.active,
+        }), 200

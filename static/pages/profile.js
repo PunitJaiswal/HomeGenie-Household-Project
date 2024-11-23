@@ -124,6 +124,15 @@ const profile = {
                 <br><br>
             </form>
             </div>
+            <div v-if="user.roles=='professional'" class='review-box'>
+                <h2>All Reviews</h2><br>
+                <p><strong>Overall Rating: </strong>{{user.rating}} ★</p>
+                <div class="review" v-for="review in allReview" :key="review.id">
+                    <p>{{review.review}}</p>
+                    <p><strong>Rating: </strong>{{review.rating}} ★</p>
+                    <p><strong>By: </strong>{{review.customer_name}}</p>
+                </div>
+            </div>
         </div>
     </div>
     `,
@@ -135,6 +144,7 @@ const profile = {
             allServices:[],
             service_type: '',
             description:"",
+            allReview:[],
         }
     },
     methods : {
@@ -218,6 +228,20 @@ const profile = {
             });
             if (response.ok) {
                 this.allServices = await response.json();
+            } else {
+                alert("Failed to fetch services");
+            }
+        } catch (error) {
+            console.error("Error fetching services:", error);
+        }
+        try {
+            const response = await fetch(window.location.origin + "/api/reviews/professional/" + this.$route.params.id, {
+                headers: {
+                    "Authentication-Token": sessionStorage.getItem("token")
+                }
+            });
+            if (response.ok) {
+                this.allReview = await response.json();
             } else {
                 alert("Failed to fetch services");
             }

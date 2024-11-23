@@ -1,15 +1,18 @@
 from flask import Flask
 from flask_security import Security, SQLAlchemyUserDatastore
-from views import create_view
-from models import *
-from create_initial_data import create_data
-import resources
+from website.views import create_view
+from website.models import *
+from website.create_initial_data import create_data
+import website.resources as resources
+from flask_socketio import SocketIO, emit
+from flask_cors import CORS
 
 
 security = Security()
 
 def create_app():
     app = Flask(__name__)
+    CORS(app)
 
     # Configuration
     app.config['DEBUG'] = True

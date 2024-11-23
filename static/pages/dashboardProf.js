@@ -5,49 +5,80 @@ const dashboardProf = {
     <div class='dashboard'>
         <h1><u>Professional Dashboard</u></h1>
         <br><br>
-        <h2 style="text-align:left;"><u>All Services</u></h2>
+        <h2 style="text-align:left;"><u>All Requests</u></h2>
         <br>
-        <table v-if="allServices.length" class="view_table">
+        <table v-if="allRequests.length" class="view_table">
             <thead class="table_head">
                 <tr>
-                    <td><h3>Name</h3></td>
-                    <td><h3>Description</h3></td>
-                    <td><h3>Base Price (Rs.)</h3></td>
-                    <td><h3>Time Required</h3></td>
+                    <td><h3>Customer Name</h3></td>
+                    <td><h3>Message</h3></td>
+                    <td><h3>Location</h3></td>
+                    <td><h3>Action</h3></td>
+                    <td><h3>Rating</h3></td>
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="service in allServices" :key="service.id">
-                    <td>{{service.name}}</td>
-                    <td>{{service.description}}</td>
-                    <td>{{service.base_price}}</td>
-                    <td>{{service.time_required}} hr</td>
+                <tr v-for="request in allRequests" :key="request.id">
+                    <td>{{request.customer_name}}</td>
+                    <td>{{request.remarks}}</td>
+                    <td>{{request.location}}</td>
+                    <td>
+                        <button v-if="request.status === 'Pending'" class="accept_link" @click="acceptRequest(request.id)" >Accept</button>
+                        <button v-if="request.status === 'Pending'" class="reject_link" @click="rejectRequest(request.id)" >Reject</button>
+                        <h3 class="completed-word" v-if="request.status == 'Completed'">{{request.status}}</h3>
+                    </td>
+                    <td v-if="request.status === 'Completed'">{{request.rating}}</td>
+                    <td v-else>Not Provided yet</td>
                 </tr>
             </tbody>
         </table>
-        <h3 v-if="!allServices.length">No Service registered yet</h3>
+        <h3 v-if="!allRequests.length">No Request recieved yet</h3>
     </div>
     `,
     data() {
         return {
-            newServices : [],
-            allServices :[],
+            allRequests : [],
         };
     },
+    methods : {
+      async acceptRequest(id) {
+          const res = await fetch(window.location.origin + '/api/requests/accept/' + id, {
+              method : 'PUT',
+              headers : {
+                  'Authentication-Token' : sessionStorage.getItem('token')
+              },
+          });
+          const data = await res.json();
+          this.allRequests = this.allRequests.filter(request => {
+              return request.id !== id
+          });
+      }  
+    },
+    async rejectRequest(id) {
+        const res = await fetch(window.location.origin + '/api/requests/reject/' + id, {
+            method : 'PUT',
+            headers : {
+                'Authentication-Token' : sessionStorage.getItem('token')
+            },
+        });
+        const data = await res.json();
+        this.allRequests = this.allRequests.filter(request => {
+            return request.id !== id
+        });
+    },
     async mounted() {
-        const res = await fetch(window.location.origin + '/api/services', {
+        const res = await fetch(window.location.origin + '/api/requests/professional/' + sessionStorage.getItem('id'), {
             headers : {
                 'Authentication-Token' : sessionStorage.getItem('token')
             },
         });
         try {
             const data = await res.json();
-            this.allServices = data;
+            this.allRequests = data;
         } catch(e) {
             console.log('Error in converting to json');
         }  
     },
-    components : { Service },
 };
 
 
