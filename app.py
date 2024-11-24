@@ -1,12 +1,12 @@
 from flask import Flask
 from flask_security import Security, SQLAlchemyUserDatastore
-from website.views import create_view
-from website.models import *
+from backend.views import create_view
+from backend.models import *
 from flask_wtf.csrf import CSRFProtect
-from website.create_initial_data import create_data
-from website.config import LocalDevelopmentConfig
+from backend.create_initial_data import create_data
+from backend.config import LocalDevelopmentConfig
 from flask_caching import Cache
-from website.celery.celery_factory import celery_init_app
+from backend.celery.celery_factory import celery_init_app
 import flask_excel as excel
 
 # Initialize the Cache object
@@ -44,7 +44,7 @@ def create_app():
     app.app_context().push()
 
     # Initialize Flask-Restful API
-    from website.resources import api
+    from backend.resources import api
     api.init_app(app)
 
     # Setup views and routes
@@ -55,7 +55,7 @@ def create_app():
 app = create_app()
 celery_app = celery_init_app(app)
 
-import website.celery.celery_schedule
+import backend.celery.celery_schedule
 
 
 if __name__ == '__main__':

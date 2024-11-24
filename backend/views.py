@@ -4,9 +4,9 @@ from flask_security import SQLAlchemySessionUserDatastore
 from flask_security.utils import hash_password, verify_password
 from datetime import datetime
 import os
-from website.models import *
+from backend.models import *
 from werkzeug.utils import secure_filename
-from website.celery.tasks import create_csv
+from backend.celery.tasks import create_csv
 from celery.result import AsyncResult
 
 def create_view(app: Flask, user_datastore : SQLAlchemySessionUserDatastore, db, cache):
@@ -25,7 +25,7 @@ def create_view(app: Flask, user_datastore : SQLAlchemySessionUserDatastore, db,
     def getCSV(task_id):
         result = AsyncResult(task_id)
         if result.ready():
-            return send_file(f'./website/celery/user-downloads/{result.result}')
+            return send_file(f'./backend/celery/user-downloads/{result.result}')
         else:
             return {'message' : 'Task not ready'}
 

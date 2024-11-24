@@ -1,6 +1,6 @@
 from flask_restful import Resource, Api, fields, reqparse, marshal_with
 from flask_security import auth_required, roles_required
-from website.models import Service, db, ServiceRequest, User, Review
+from backend.models import Service, db, ServiceRequest, User, Review
 from flask import current_app as app
 import datetime
 

@@ -1,6 +1,6 @@
 from flask_security import SQLAlchemyUserDatastore
 from flask_security.utils import hash_password
-from website.models import db
+from backend.models import db
 
 def create_data(user_datastore):
     print("---------------Creating Data-------------------")
