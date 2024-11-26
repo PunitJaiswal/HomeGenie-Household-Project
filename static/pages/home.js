@@ -7,8 +7,7 @@ const home = {
         <br><br><br>
         <button class='reg-btn'><router-link to='/signup'>Signup</router-link></button>
     </div>
-    `,
-    
+    `,   
 }
 
 export default home;

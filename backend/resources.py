@@ -148,7 +148,7 @@ class Service_Request(Resource):
         db.session.add(request)
         db.session.commit()
 
-        return {'message': 'Service Created Successfully'}, 201
+        return {'message': 'Request Created Successfully', 'status':'success'}, 201
     
 class deleteRequest(Resource):
     @auth_required('token')
@@ -212,7 +212,7 @@ class ServiceRequestbyProfessional(Resource):
             'id': requests.id,
             'customer_id': requests.customer_id,
             'customer_name': User.query.get(requests.customer_id).name,
-            'rating': User.query.get(requests.professional_id).rating,
+            'rating': Review.query.filter_by(request_id=requests.id).first().rating if Review.query.filter_by(request_id=requests.id).first() else 'Not Rated',
             'service_id': requests.service_id,
             'location' : User.query.get(requests.customer_id).location,
             'service_type': Service.query.get(requests.service_id).name,
@@ -265,6 +265,7 @@ class ReviewResource(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('customer_id', type=int)
         parser.add_argument('professional_id', type=int)
+        parser.add_argument('request_id', type=int)
         parser.add_argument('rating', type=int)
         parser.add_argument('review', type=str)
 
@@ -274,10 +275,11 @@ class ReviewResource(Resource):
         review = Review(
             customer_id=args['customer_id'],
             professional_id=args['professional_id'],
+            request_id = args['request_id'],
             rating=args['rating'],
             review=args['review']
         )
-        request = ServiceRequest.query.filter_by(customer_id=args['customer_id'], professional_id=args['professional_id']).first()
+        request = ServiceRequest.query.filter_by(id=args['request_id']).first()
         prof = User.query.filter_by(id=args['professional_id']).first()
         if prof.rating:
             prof.rating = (prof.rating + args['rating'])/2
@@ -303,10 +305,11 @@ class ReviewByProfessional(Resource):
     
     
 api.add_resource(Service_Request, '/requests')
-api.add_resource(ServiceRequestbyCustomer, '/requests/customer/<int:customer_id>')
 api.add_resource(deleteRequest, '/requests/delete/<int:request_id>')
 api.add_resource(updateRequest, '/requests/update/<int:request_id>')
+api.add_resource(ServiceRequestbyCustomer, '/requests/customer/<int:customer_id>')
 api.add_resource(ServiceRequestbyProfessional, '/requests/professional/<int:professional_id>')
+
 # Actions Performed by Professional
 api.add_resource(acceptRequest, '/requests/accept/<int:request_id>')
 api.add_resource(rejectRequest, '/requests/reject/<int:request_id>')

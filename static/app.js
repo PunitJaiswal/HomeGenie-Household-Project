@@ -1,23 +1,46 @@
-import router from "./utils/router.js"
-import Navbar from "./components/navbar.js"
-import store from "./utils/store.js"
+import router from "./utils/router.js";
+import Navbar from "./components/navbar.js";
+import store from "./utils/store.js";
+import alertComponent from "./components/alertComponent.js";
 
 
 new Vue({
-    el : '#app',
+    el: '#app',
     template: `
-    <div>
-        <navbar/>
-        <router-view/>
-    </div>
+        <div>
+            <alertComponent ref="alert" />
+            <navbar />
+            <router-view />
+        </div>
     `,
     router,
     store,
     created() {
         // Initialize store state on app load
         this.$store.commit('initializeStore');
+        
+        // Subscribe to store mutations
+        this.$store.subscribe((mutation, state) => {
+            if (mutation.type === 'SET_ALERT') {
+                const { message, type } = mutation.payload;
+                
+                // Wait for Vue to fully render and $refs to be available
+                this.$nextTick(() => {
+                    if (this.$refs.alert) {
+                        console.log("Calling showAlert from store subscription");
+                        this.$refs.alert.showAlert(message, type);
+                    } else {
+                        console.error("Alert component is still not available when calling showAlert.");
+                    }
+                });
+            }
+        });
     },
-    components : {
+    mounted() {
+        console.log(this.$refs);
+    },     
+    components: {
         Navbar,
+        alertComponent,
     },
 });

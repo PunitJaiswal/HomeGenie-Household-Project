@@ -67,3 +67,4 @@ class Review(db.Model):
     professional_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     rating = db.Column(db.Integer, nullable=False)
     review = db.Column(db.String, nullable=False)
+    request_id = db.Column(db.Integer, db.ForeignKey('service_request.id'), nullable=False)

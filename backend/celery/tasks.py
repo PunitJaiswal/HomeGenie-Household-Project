@@ -59,6 +59,7 @@ def send_daily_reminders():
         # Send email
         send_email(professional.email, subject, content)
 
+
 @shared_task(ignore_result=True)
 def send_monthly_activity_report():
     # Get the current date and calculate the previous month

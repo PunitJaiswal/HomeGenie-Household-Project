@@ -17,26 +17,6 @@ h1{
     color: maroon;
 }
 
-.errorMessage{
-    background-color: #ff000054;
-    width: fit-content;
-    padding: 1vmin 6vmin;
-    border-radius: 5vmin;
-    font-size: 20px;
-    align-self: center;
-    color: white;
-}
-
-.successMessage{
-    background-color: lightgreen;
-    width: fit-content;
-    padding: 1vmin 6vmin;
-    border-radius: 5vmin;
-    font-size: 20px;
-    align-self: center;
-    color: white;
-}
-
 .login-dash{
     align-self: center;
     margin: 5vmin;
@@ -189,6 +169,12 @@ h1{
     font-size: 3vmin;
 }
 
+.navbar a:current {
+    background-color: lightcoral;
+    color: black;
+    font-size: 3vmin;
+}
+
 .dashboard .accept_link{
     background-color: #588157;
     font-weight: bold;
@@ -224,28 +210,6 @@ h1{
     border-radius: 2vmin;
 }
 
-.view_table{
-    border-collapse: collapse;
-    width: 100%;
-    text-align: justify;
-}
-
-.table_head{
-    background-color: lightgray;
-}
-
-td, th{
-    border-bottom: 1px solid black;
-    text-align: left;
-    padding: 8px;
-}
-
-.add_logo{
-    font-size: 60px;
-    color:#0096C1;
-    cursor: pointer;
-}
-
 .add_service_form {
     position: fixed;  /* Position relative to the viewport */
     top: 50%;         /* Position from the top */
@@ -260,6 +224,12 @@ td, th{
     z-index: 1000;    /* Ensure it's on top of other elements */
 }
 
+.add_logo{
+    font-size: 60px;
+    color:#0096C1;
+    cursor: pointer;
+}
+
 .left-topic{
     text-align: left;
     margin-left: 5vmin
@@ -269,7 +239,7 @@ td, th{
     display: flex;
     flex-wrap: wrap;
     width: 100%;
-    justify-content: center;
+    justify-content: space-evenly;
     margin: 10px 10px 0 0;
     align-items: center;
     gap: 5vmin;
@@ -290,8 +260,14 @@ td, th{
     border-collapse: collapse;
     width: 100%;
     text-align: justify;
+    background-color: #f4f3ee;
 }
 
+.profile_table{
+    border-collapse: collapse;
+    width: 100%;
+    text-align: justify;
+}
 
 .table_head{
     background-color: lightgray;
@@ -409,4 +385,76 @@ textarea{
     border: 1px solid black; 
     border-radius: 5px;
     font-size: 13px; 
+}
+
+
+.alert-box {
+    position: fixed;
+    top: 14vmin;
+    right: 30px;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+  }
+  .alert-info {
+    background-color: #d9edf7;
+    color: #31708f;
+  }
+  .alert-success {
+    background-color: #dff0d8;
+    color: #3c763d;
+  }
+  .alert-warning {
+    background-color: #fcf8e3;
+    color: #8a6d3b;
+  }
+  .alert-error {
+    background-color: #f2dede;
+    color: #a94442;
+  }
+  .close-btn {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    margin-left: 10px;
+  }
+
+
+.stat_table {
+  text-align: center;
+  width: 75%;
+  height: 20vmin;
+  align-self: center; 
+  text-align: center;
+  border-collapse: collapse; 
+  margin: 20px 0;
+  font-size: 1rem;
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.stat_table thead tr {
+  background-color: #7a92b1;
+  color: white;
+  height: 8vmin;
+  text-transform: uppercase; 
+  font-weight: bold;
+}
+
+.stat_table thead th {
+  padding: 15px;
+  border: 1px solid #ddd; 
+}
+
+.stat_table th{
+    text-align: center;
+    font-size: 16px;
+}
+
+.stat_table td{
+    text-align: center;
+    font-size: 30px;
+    font-weight: bold;
 }

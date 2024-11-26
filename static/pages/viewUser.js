@@ -1,12 +1,16 @@
+import alertComponent from "../components/alertComponent.js";
+
 const viewUser = {
     template : `
     <div class='dashboard'>
+        <alertComponent ref='alert' />
+        
         <div class='container'>
             <div class="view_box">
                 <h2 v-if="user.roles == 'professional'" style="color: maroon; text-align: center; text-decoration: underline;">Professional</h2>
                 <h2 v-if="user.roles == 'customer'" style="color: maroon; text-align: center; text-decoration: underline;">Customer</h2>
                 <br>
-                <table class="view_table">
+                <table class="profile_table">
                     <thead>
                         <tr>
                             <th v-if='user.roles=="professional"'><h3>Professional Details</h3></th>
@@ -68,7 +72,7 @@ const viewUser = {
             user: {}
         }
     },
-    methods: {
+    methods: {    
         async sendApproval(id) {
             const res = await fetch(window.location.origin + '/activate-user/' + id, {
                 headers: {
@@ -76,7 +80,15 @@ const viewUser = {
                 },
             });
             if (res.ok) {
-                alert('User activated');
+                this.$refs.alert.showAlert('User Activated', 'success');
+            }
+            const userRes = await fetch(window.location.origin + '/viewUser/' + this.$route.params.id, {
+                headers: {
+                    'Authentication-Token': sessionStorage.getItem('token')
+                },
+            });
+            if (userRes.ok) {
+                this.user = await userRes.json();
             }
         },
         // Block/Flag User
@@ -87,7 +99,15 @@ const viewUser = {
                 },
             });
             if (res.ok) {
-                alert('User flagged');
+                this.$refs.alert.showAlert('User Flagged', 'error')
+            }
+            const userRes = await fetch(window.location.origin + '/viewUser/' + this.$route.params.id, {
+                headers: {
+                    'Authentication-Token': sessionStorage.getItem('token')
+                },
+            });
+            if (userRes.ok) {
+                this.user = await userRes.json();
             }
         },
     },
@@ -107,6 +127,9 @@ const viewUser = {
             console.error('Error fetching user data:', error);
         }
     },
-}
+    components: {
+        alertComponent,
+    }
+};
 
 export default viewUser;

@@ -11,6 +11,9 @@ import manageService from '../pages/manageService.js';
 import viewUser from '../pages/viewUser.js';
 import viewServiceProf from '../pages/viewServiceProf.js';
 import searchProf from '../pages/searchProf.js';
+import statsAdmin from '../pages/statsAdmin.js';
+import statsProf from '../pages/statsProf.js';
+import statsCust from '../pages/statsCust.js';
 
 const routes = [
     {path : '/', component : home},
@@ -25,6 +28,9 @@ const routes = [
     {path : '/viewUser/:id', component : viewUser, meta: { requiresLogin: true }},
     {path : '/viewServiceProf/:id', component : viewServiceProf, meta: { requiresLogin: true }},
     {path : '/searchProf', component : searchProf, meta: { requiresLogin: true }},
+    {path : '/statsAdmin', component : statsAdmin, meta: { requiresLogin: true }},
+    {path : '/statsProf', component : statsProf, meta: { requiresLogin: true }},
+    {path : '/statsCust', component : statsCust, meta: { requiresLogin: true }},
 ]
 
 const router = new VueRouter({

@@ -1,11 +1,16 @@
+import alertComponent from "../components/alertComponent.js";
+
 const profile = {
     template : `
     <div class='dashboard'>
         <div class='container'>
+            <!-- Message Flashing -->
+            <alertComponent ref='alert' />
+
             <div v-if="showViewForm" class="view_box">
                 <h2 style="color: maroon; "><u>Profile</u></h2>
                 <br>
-                <table class="view_table">
+                <table class="profile_table">
                     <thead>
                         <tr>
                             <th v-if='user.roles=="professional"'><h3>Professional Details</h3></th>
@@ -67,7 +72,7 @@ const profile = {
                 <h2 style="color: maroon; "><u>Edit Profile</u></h2>
                 <br>
                 <form @submit.prevent="updateUser(user)">
-                <table class="view_table">
+                <table class="profile_table">
                     <thead>
                         <tr>
                             <th v-if='user.roles=="professional"'><h3>Professional Details</h3></th>
@@ -183,25 +188,30 @@ const profile = {
                 }
             }
         
-            try {
-                const res = await fetch(window.location.origin + '/updateUser/' + user.id, {
-                    method: 'PUT',
-                    headers: {
-                        'Authentication-Token': sessionStorage.getItem('token'),
-                    },
-                    body: formData,
-                });
-        
-                if (res.ok) {
-                    const updatedUser = await res.json();
-                    this.showEditForm = false;
-                    this.showViewForm = true;
-                    this.user = updatedUser; // Update the user object with the response data
-                } else {
-                    alert("Failed to update user. Please check the inputs.");
-                }
-            } catch (error) {
-                console.error("Error updating user:", error);
+            const res = await fetch(window.location.origin + '/updateUser/' + user.id, {
+                method: 'PUT',
+                headers: {
+                    'Authentication-Token': sessionStorage.getItem('token'),
+                },
+                body: formData,
+            });
+    
+            if (res.ok) {
+                const updatedUser = await res.json();
+                this.showEditForm = false;
+                this.showViewForm = true;
+                this.user = updatedUser;
+                this.$refs.alert.showAlert('Profile Updated Successfully', 'success')
+            } else {
+                this.$refs.alert.showAlert('Failed to update user. Please check the inputs', 'error')
+            }
+            const userRes = await fetch(window.location.origin + '/viewUser/' + this.$route.params.id, {
+                headers: {
+                    'Authentication-Token': sessionStorage.getItem('token')
+                },
+            });
+            if (userRes.ok) {
+                this.user = await userRes.json();
             }
         },
     },        
@@ -249,6 +259,9 @@ const profile = {
         } catch (error) {
             console.error("Error fetching services:", error);
         }
+    },
+    components: {
+        alertComponent,
     }
 };
 

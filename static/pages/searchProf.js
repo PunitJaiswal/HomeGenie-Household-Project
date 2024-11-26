@@ -1,9 +1,11 @@
+import alertComponent from "../components/alertComponent.js";
+
 const searchProf = {
     template: `
     <div class='dashboard'>
         <!-- Message Flashing -->
-        <div v-if="status === 'error'" class='errorMessage'>{{message}}</div>
-        <div v-if="status === 'success'" class='successMessage'>{{message}}</div>
+        <alertComponent ref='alert' />
+
         <br><br>
         <h2 style="text-align:left;"><u>Search Professionals:</u></h2>
         <br>
@@ -43,7 +45,7 @@ const searchProf = {
         <div v-if="showViewForm" class="add_service_form">
             <h2 style="color: maroon; text-align: center; text-decoration: underline;">Professional</h2>
             <br>
-            <table class="view_table">
+            <table class="profile_table">
                 <thead>
                     <tr>
                         <th><h3>Professional Details</h3></th>
@@ -119,6 +121,7 @@ const searchProf = {
             location:"",
             pincode:"",
             user:{},
+            prof:{},
             newRequest:{
                 service_id: null,
                 professional_id: null,
@@ -132,39 +135,28 @@ const searchProf = {
     methods: {
         // View User
         async viewUser(id) {
-            try {
-                this.isLoading = true; // Set loading state to true
-        
-                // Fetch user data before navigating
-                const userRes = await fetch(window.location.origin + '/customer/viewProf/' + id, {
-                    headers: {
-                        'Authentication-Token': sessionStorage.getItem('token')
-                    },
-                });
-                
-                if (!userRes.ok) throw new Error('Failed to fetch user data');
-                
-                // Now, navigate after the data is fetched
-                this.$router.push('/viewUser/' + id);
-        
-            } catch (error) {
-                console.error('Error fetching user data:', error);
-                alert('Failed to load user data');
-            } finally {
-                this.isLoading = false; // Set loading state to false
-            }
+            const userRes = await fetch(window.location.origin + '/customer/viewProf/' + id, {
+                headers: {
+                    'Authentication-Token': sessionStorage.getItem('token')
+                },
+            });
+            
+            if (!userRes.ok) throw new Error('Failed to fetch user data');
+            
+            this.$router.push('/viewUser/' + id);
         },
         openAddForm(prof) {
             this.showAddForm = true;
             this.prof = prof;
         },
         async sendRequest() {
-            // Populate the newRequest object with the relevant values
-            this.newRequest.professional_id = this.prof.id;
-            this.newRequest.service_id = this.service.id;
-            this.newRequest.remarks = this.newRequest.remarks || '';
-            this.newRequest.customer_id = this.customer.id;
-    
+            // Ensure the necessary fields are populated
+            this.newRequest.professional_id = this.prof.id; // From the selected professional
+            this.newRequest.service_id = this.prof.service_id; // Service ID is likely stored in the selected professional object
+            this.newRequest.remarks = this.newRequest.remarks || ''; // Remarks provided by the user
+            this.newRequest.customer_id = sessionStorage.getItem('id'); // Get customer ID from session storage
+        
+            
             const response = await fetch(`${window.location.origin}/api/requests`, {
                 method: 'POST',
                 headers: {
@@ -176,17 +168,11 @@ const searchProf = {
     
             if (response.ok) {
                 const result = await response.json();
-                alert(result.message || 'Request sent successfully!');
-    
-                // Mark the professional as requested (optional if needed in UI)
-                const prof = this.allServiceProfs.find(prof => prof.id === this.prof.id);
-                if (prof) prof.requested = true;
-    
-                // Close the form after successful submission
-                this.showAddForm = false;
+                this.$refs.alert.showAlert('Request Sent successfully', 'success')
+                this.showAddForm = false; // Close the form on success
             } else {
                 const error = await response.json();
-                alert(error.message || 'Failed to send request.');
+                this.$refs.alert.showAlert('Failed to send request', 'error');
             }
         },
         async searchProf() {
@@ -215,14 +201,12 @@ const searchProf = {
                 return;
             }
             if (data.results && data.results.length > 0) {
-                this.activeProfs = data.results; // Populate results
-                this.status = "success";
-                this.message = "Professionals searched successfully.";
+                this.activeProfs = data.results;
+                this.$refs.alert.showAlert('Professional searched successfully', 'info')
             } else {
                 // No professionals found
                 this.activeProfs = [];
-                this.status = "error";
-                this.message = "No professionals found matching the criteria.";
+                this.$refs.alert.showAlert('No professionals found', 'error')
             }
         },
         async openViewForm(id) {
@@ -235,7 +219,7 @@ const searchProf = {
                 this.user = await userRes.json();
                 this.showViewForm = true; // Open the view form once data is loaded
               } else {
-                alert("Failed to load user data");
+                this.$refs.alert.showAlert('Failed to fetch user data', 'error')
               }
             },
     },        
@@ -248,6 +232,9 @@ const searchProf = {
         });
         this.activeProfs = await profsRes.json();
     },
+    components: {
+        alertComponent,
+    }
 };
 
 export default searchProf;

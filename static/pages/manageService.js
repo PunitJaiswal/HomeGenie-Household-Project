@@ -1,10 +1,18 @@
+import alertComponent from "../components/alertComponent.js";
+
 const manageService = {
     template: `
     <div class='dashboard'>
-        <h2 style="text-align:left;"><u>All Services</u></h2>
+        <alertComponent ref='alert' />
+        <h1><u>Manage Services</u></h1>
         <br>
         <table v-if="allServices.length" class="view_table">
             <thead class="table_head">
+                <tr>
+                    <td colspan="7" style="text-align:center; background-color: #748cab">
+                        <h2>All Services</h2>
+                    </td>
+                </tr>
                 <tr>
                     <td><h3>Name</h3></td>
                     <td><h3>Description</h3></td>
@@ -106,8 +114,19 @@ const manageService = {
                     base_price: null,
                     time_required: null
                 };
+                this.$refs.alert.showAlert('Service Added Successfully', 'success')
+            }
+            // Update allServices
+            const response = await fetch(window.location.origin + '/api/services', {
+                headers: {
+                    'Authentication-Token': sessionStorage.getItem('token')
+                },
+            });
+            if (response.ok) {
+                this.allServices = await response.json();
             }
         },
+
         openEditForm(service) {
             this.newService = { ...service }; // Clone the service to avoid direct mutation
             this.showEditForm = true;        // Show the edit form
@@ -126,6 +145,16 @@ const manageService = {
                 const index = this.allServices.findIndex(s => s.id === service.id);
                 this.allServices[index] = updatedService;
                 this.showEditForm=false;
+                this.$refs.alert.showAlert('Service Updated Successfully', 'success');
+            }
+            // update allServices
+            const response = await fetch(window.location.origin + '/api/services', {
+                headers: {
+                    'Authentication-Token': sessionStorage.getItem('token')
+                },
+            });
+            if (response.ok) {
+                this.allServices = await response.json();
             }
         },
         async deleteService(id) {
@@ -136,10 +165,19 @@ const manageService = {
                 },
             });
             if (res.ok) {
-                alert('Service Deleted');
+                this.$refs.alert.showAlert('Service deleted', 'error');
             } else {
                 const error = await res.json();
-                alert('Error: ' + (error.message || 'Failed to delete service'));
+                this.$refs.alert.showAlert('Failed to delete service', 'error')
+            }
+            // Update allServices
+            const response = await fetch(window.location.origin + '/api/services', {
+                headers: {
+                    'Authentication-Token': sessionStorage.getItem('token')
+                },
+            });
+            if (response.ok) {
+                this.allServices = await response.json();
             }
         },
         async getServiceRequest() {
@@ -159,8 +197,9 @@ const manageService = {
                 if (res.ok) {
                     window.open(`${window.location.origin}/get-service-request/${task_id}`);
                     clearInterval(interval);
+                    this.$refs.alert.showAlert('CSV File Downloaded', 'info')
                 }
-            }, 100);
+            }, 1000);
         }
     },
     async mounted() {
@@ -174,7 +213,10 @@ const manageService = {
         } else {
             alert('Failed to fetch services');
         }
-    },        
+    },
+    components: {
+        alertComponent,
+    }
 };
 
 export default manageService;

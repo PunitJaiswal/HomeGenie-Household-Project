@@ -1,9 +1,12 @@
+import alertComponent from "../components/alertComponent.js";
+
 const dashboardAdmin = {
     template: `
     <div class='dashboard'>
         <!-- Message Flashing -->
-        <div v-if="status === 'error'" class='errorMessage'>{{message}}</div>
-        <div v-if="status === 'success'" class='successMessage'>{{message}}</div>
+        <alertComponent ref='alert' />
+        
+        <h1 style="text-align:left; font-size: 6vmin; margin-top:0vmin;"><u>Welcome Admin,</u></h1>
         <div class="search-filter">
             <form @submit.prevent="searchUser" method="POST">
                 <input type="text" v-model="name" placeholder="Enter Name">
@@ -12,12 +15,13 @@ const dashboardAdmin = {
                 <button class="accept_link">Search User</button>
             </form>
         </div>
-        <h1 style="text-align:left;"><u> Admin Dashboard </u></h1>
-        <br><br>
-        <h2 style="text-align:left;"><u>All Professionals:</u></h2>
-        <br>
         <table v-if="allProfs.length" class="view_table">
             <thead class="table_head">
+                <tr>
+                    <td colspan="7" style="text-align:center; background-color: #748cab">
+                        <h2>All Professionals</h2>
+                    </td>
+                </tr>
                 <tr>
                     <td><h3>Name</h3></td>
                     <td><h3>Service Type</h3></td>
@@ -42,10 +46,14 @@ const dashboardAdmin = {
         </table>
         <h3 v-if="!allProfs.length">No Professionals</h3>
         <br><br><br>
-        <h2 style="text-align:left;"><u>All Customers:</u></h2>
         <br>
         <table v-if="allCusts.length" class="view_table">
             <thead class="table_head">
+                <tr>
+                    <td colspan="7" style="text-align:center; background-color: #748cab">
+                        <h2>All Customers</h2>
+                    </td>
+                </tr>
                 <tr>
                     <td><h3>Name</h3></td>
                     <td><h3>Location</h3></td>
@@ -92,8 +100,20 @@ const dashboardAdmin = {
             if (res.ok) {
                 this.message = "User activated";
                 this.status = 'success';
-                alert('User activated');
+                this.$refs.alert.showAlert('User Activated', 'success')
             }
+            const custsRes = await fetch(window.location.origin + '/all-cust-list', {
+                headers: {
+                    'Authentication-Token': sessionStorage.getItem('token')
+                },
+            });
+            this.allCusts = await custsRes.json();
+            const profsRes = await fetch(window.location.origin + '/all-prof-list', {
+                headers: {
+                    'Authentication-Token': sessionStorage.getItem('token')
+                },
+            });
+            this.allProfs = await profsRes.json();
         },
         // Block/Flag User
         async flagUser(id) {
@@ -105,8 +125,20 @@ const dashboardAdmin = {
             if (res.ok) {
                 this.message = "User flagged";
                 this.status = 'error';
-                alert('User flagged');
+                this.$refs.alert.showAlert("User Flagged", "error");
             }
+            const custsRes = await fetch(window.location.origin + '/all-cust-list', {
+                headers: {
+                    'Authentication-Token': sessionStorage.getItem('token')
+                },
+            });
+            this.allCusts = await custsRes.json();
+            const profsRes = await fetch(window.location.origin + '/all-prof-list', {
+                headers: {
+                    'Authentication-Token': sessionStorage.getItem('token')
+                },
+            });
+            this.allProfs = await profsRes.json();
         },
         // Search User
         async searchUser() {
@@ -135,7 +167,7 @@ const dashboardAdmin = {
                 // Handle errors with appropriate message
                 this.status = "error";
                 this.message = data.message || "Failed to fetch professionals. Please try again.";
-                return;
+                this.$refs.alert.showAlert('User Searched Successfully', 'success')
             }
     
             // Handle success response
@@ -152,30 +184,22 @@ const dashboardAdmin = {
                 this.message = "No Users found matching the criteria.";
             }
         },
-
+        
         // View User
         async viewUser(id) {
-            try {
-                this.isLoading = true; // Set loading state to true
-        
-                // Fetch user data before navigating
-                const userRes = await fetch(window.location.origin + '/viewUser/' + id, {
-                    headers: {
-                        'Authentication-Token': sessionStorage.getItem('token')
-                    },
-                });
-                
-                if (!userRes.ok) throw new Error('Failed to fetch user data');
-                
-                // Now, navigate after the data is fetched
-                this.$router.push('/viewUser/' + id);
-        
-            } catch (error) {
-                console.error('Error fetching user data:', error);
-                alert('Failed to load user data');
-            } finally {
-                this.isLoading = false; // Set loading state to false
-            }
+            this.isLoading = true; // Set loading state to true
+    
+            // Fetch user data before navigating
+            const userRes = await fetch(window.location.origin + '/viewUser/' + id, {
+                headers: {
+                    'Authentication-Token': sessionStorage.getItem('token')
+                },
+            });
+            
+            if (!userRes.ok) throw new Error('Failed to fetch user data');
+            
+            // Now, navigate after the data is fetched
+            this.$router.push('/viewUser/' + id);
         },              
     },
     async mounted() {
@@ -195,6 +219,9 @@ const dashboardAdmin = {
         });
         this.allCusts = await custsRes.json();
     },
+    components: {
+        alertComponent,
+    }
 };
 
 export default dashboardAdmin;

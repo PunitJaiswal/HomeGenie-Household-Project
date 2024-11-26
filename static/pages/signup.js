@@ -1,3 +1,4 @@
+import alertComponent from "../components/alertComponent.js";
 import router from "../utils/router.js"
 
 const signup = {
@@ -9,8 +10,7 @@ const signup = {
         </div>
         <div class='login-container'>
             <!-- Message Flashing -->
-            <div v-if="status === 'error'" class='errorMessage'>{{message}}</div>
-            <div v-if="status === 'success'" class='successMessage'>{{message}}</div>
+            <alertComponent ref='alert' />
             <br><br>
             <div class="signup-box">
                 <div class='input'>
@@ -124,25 +124,24 @@ const signup = {
         
             // Append the file
             if (this.description) {
-                formData.append('description', this.description); // Attach the file
+                formData.append('description', this.description); 
             }
         
             const url = window.location.origin;
             const res = await fetch(url + '/signup', {
                 method: 'POST',
-                body: formData, // Send as multipart/form-data
-                credentials: 'same-origin', // Ensure cookies are sent if needed
+                body: formData, 
+                credentials: 'same-origin', 
             });
         
             if (res.ok) {
                 const data = await res.json();
-                console.log(data);
-                router.push('login'); // Redirect to login page on success
+                this.$refs.alert.showAlert('User Registered Successfully', 'success')
+                router.push('login'); 
             } else {
                 const errorData = await res.json();
                 console.error('Signup failed', errorData);
-                this.status = 'error';
-                this.message = errorData.message;
+                this.$refs.alert.showAlert(errorData.message, errorData.status)
             }
         },
         
@@ -163,6 +162,9 @@ const signup = {
             console.error("Error fetching services:", error);
         }
     },
+    components: {
+        alertComponent,
+    }
 };
 
 

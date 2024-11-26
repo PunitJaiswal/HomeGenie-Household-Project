@@ -1,3 +1,5 @@
+import alertComponent from "../components/alertComponent.js";
+
 const login = {
     template: `
     <div class="login-dash">
@@ -8,8 +10,7 @@ const login = {
         
         <div class='login-container'>
             <!-- Message Flashing -->
-            <div v-if="status === 'error'" class='errorMessage'>{{message}}</div>
-            <div v-if="status === 'success'" class='successMessage'>{{message}}</div>
+            <alertComponent ref='alert' />
             <br><br>
             <div class="login-box">
                 <h2 class='top-heading'> Login </h2><br>
@@ -34,8 +35,6 @@ const login = {
         return {
             email : "",
             password : "",
-            message : '',
-            status : ''
         };
     },
     methods : {
@@ -72,16 +71,14 @@ const login = {
                             break;
                     }
                 } else {
-                    this.message = data.message;
-                    this.status = data.status
+                    this.$refs.alert.showAlert(data.message, data.status)
                 }
-            } else{
-                this.message = data.message
-                this.status = data.status
             }
         },
     },
-    
+    components: {
+        alertComponent,
+    }
 };
 
 export default login;

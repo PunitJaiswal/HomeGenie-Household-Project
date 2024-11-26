@@ -1,6 +1,9 @@
+import alertComponent from "../components/alertComponent.js";
+
 const viewServiceProf = {
     template: `
     <div class='dashboard'>
+        <alertComponent ref='alert' />
         <table class="view_table">
             <thead class="table_head">
                 <tr>
@@ -143,17 +146,11 @@ const viewServiceProf = {
     
             if (response.ok) {
                 const result = await response.json();
-                alert(result.message || 'Request sent successfully!');
-    
-                // Mark the professional as requested (optional if needed in UI)
-                const prof = this.allServiceProfs.find(prof => prof.id === this.prof.id);
-                if (prof) prof.requested = true;
-    
-                // Close the form after successful submission
+                this.$refs.alert.showAlert(result.message, result.status)
                 this.showAddForm = false;
             } else {
                 const error = await response.json();
-                alert(error.message || 'Failed to send request.');
+                this.$refs.alert.showAlert(error.message, 'error')
             }
         },
         async openViewForm(id) {
@@ -164,7 +161,7 @@ const viewServiceProf = {
             });
             if (userRes.ok) {
               this.user = await userRes.json();
-              this.showViewForm = true; // Open the view form once data is loaded
+              this.showViewForm = true;
             } else {
               alert("Failed to load user data");
             }
@@ -204,6 +201,9 @@ const viewServiceProf = {
             this.customer = await custRes.json();
         }
     },
+    components: {
+        alertComponent,
+    }
 };
 
 export default viewServiceProf;

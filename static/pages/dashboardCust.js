@@ -1,9 +1,12 @@
+import alertComponent from "../components/alertComponent.js";
 import Service from "../components/service.js";
 
 const dashboardCust = {
     template: `
     <div class="dashboard">
-        <h1 style="text-align:left; font-size: 6vmin; margin-top:0vmin;"><u>Customer Dashboard</u></h1>
+        <alertComponent ref='alert' />
+
+        <h1 style="text-align:left; font-size: 6vmin; margin-top:0vmin;"><u>Welcome {{self.name}},</u></h1>
         <br><br>
         <h2 style="font-size:5vmin; text-align:center;"><u>All Services</u></h2>
         <br><br>
@@ -94,6 +97,7 @@ const dashboardCust = {
   `,
   data() {
     return {
+      self:{},
       allService: [],
       allRequests: [],
       showEditForm: false,
@@ -128,7 +132,16 @@ const dashboardCust = {
           const index = this.allRequests.findIndex(req => req.id === request.id);
           this.allRequests[index] = updatedRequest;
           this.showEditForm=false;
+          this.$refs.alert.showAlert('Request Updated Successfully', 'success')
       }
+      // update allRequests
+      const reqs = await fetch(window.location.origin + "/api/requests/customer/" + sessionStorage.getItem('id'), {
+        headers: {
+          "Authentication-Token": sessionStorage.getItem("token"),
+      }
+      });
+      const requests = await reqs.json();
+      this.allRequests = requests;
     },
     async deleteRequest(req) {
       const res = await fetch(window.location.origin + '/api/requests/delete/' + req.id, {
@@ -138,11 +151,19 @@ const dashboardCust = {
           },
       });
       if (res.ok) {
-          alert('Request Deleted');
+          this.$refs.alert.showAlert('Request Deleted', 'error')
       } else {
           const error = await res.json();
-          alert('Error: ' + (error.message || 'Failed to delete service'));
+          this.$refs.alert.showAlert('Failed to delete request', 'error')
       }
+      // update allRequests
+      const reqs = await fetch(window.location.origin + "/api/requests/customer/" + sessionStorage.getItem('id'), {
+        headers: {
+          "Authentication-Token": sessionStorage.getItem("token"),
+      }
+      });
+      const requests = await reqs.json();
+      this.allRequests = requests;
   },
   openRatingForm(request) {
     this.showRatingForm = true;
@@ -155,10 +176,10 @@ const dashboardCust = {
     const ratingData = {
       professional_id: this.newRequest.professional_id,
       customer_id: this.newRequest.customer_id,
+      request_id: this.newRequest.id,
       rating: this.rating,
       review: this.review,
     };
-
     const res = await fetch(window.location.origin + '/api/reviews', {
       method: 'POST',
       headers: {
@@ -168,12 +189,19 @@ const dashboardCust = {
       body: JSON.stringify(ratingData),
     });
     if (res.ok) {
-      alert('Rating submitted successfully');
+      this.$refs.alert.showAlert('Review Submitted Successfully', 'info')
       this.showRatingForm = false;
     } else {
       const error = await res.json();
-      alert('Error: ' + (error.message || 'Failed to submit rating'));
+      this.$refs.alert.showAlert('Failed to send rating', 'error')
     }
+    const reqs = await fetch(window.location.origin + "/api/requests/customer/" + sessionStorage.getItem('id'), {
+      headers: {
+        "Authentication-Token": sessionStorage.getItem("token"),
+    }
+    });
+    const requests = await reqs.json();
+    this.allRequests = requests;
   },
 },
   async mounted() {
@@ -196,8 +224,21 @@ const dashboardCust = {
       });
       const requests = await reqs.json();
       this.allRequests = requests;
+      
+      // Fetch self
+      const userRes = await fetch(window.location.origin + '/viewUser/' + sessionStorage.getItem('id'), {
+        headers: {
+            'Authentication-Token': sessionStorage.getItem('token')
+        },
+      });
+      if (userRes.ok) {
+          this.self = await userRes.json();
+      }
     },
-    components: { Service },
+    components: { 
+      Service,
+      alertComponent,
+    },
 };
 
 export default dashboardCust;
