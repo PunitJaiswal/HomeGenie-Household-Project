@@ -170,7 +170,7 @@ const dashboardCust = {
     this.newRequest = { ...request };
   },
   setRating(star) {
-    this.rating = star;  // Update the rating based on the clicked star
+    this.rating = star;
   },
   async sendRating() {
     const ratingData = {

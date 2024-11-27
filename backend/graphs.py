@@ -42,14 +42,16 @@ def professional_count_by_service():
     if professional_count:
         labels = list(professional_count.keys())
         values = list(professional_count.values())
-        
+
         plt.bar(labels, values, align='center',color=['purple', 'green', 'red', 'orange'], alpha=0.5)
-        plt.xticks(labels, labels)
+
+        plt.xticks(labels, labels, rotation=45, ha='center')
         plt.xlabel('Services', fontweight='bold')
         plt.ylabel('Count', fontweight='bold')
         plt.title('Count of Professionals by Service', fontweight='bold', fontsize=16)
 
         file_path = './static/images/professional_count_by_service.png'
+        plt.tight_layout()
         plt.savefig(file_path, transparent=True)
         plt.close()
         return file_path
@@ -120,12 +122,13 @@ def request_count_by_service():
         values = list(request_count.values())
         
         plt.bar(labels, values, align='center',color=['blue', 'green', 'red', 'orange'], alpha=0.5)
-        plt.xticks(labels, labels)
+        plt.xticks(labels, labels, rotation=45, ha='center')
         plt.xlabel('Services', fontweight='bold')
         plt.ylabel('Count', fontweight='bold')
         plt.title('Count of Requests by Service', fontweight='bold', fontsize=16)
 
         file_path = './static/images/request_count_by_service.png'
+        plt.tight_layout()
         plt.savefig(file_path, transparent=True)
         plt.close()
         return file_path

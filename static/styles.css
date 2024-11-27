@@ -211,17 +211,17 @@ h1{
 }
 
 .add_service_form {
-    position: fixed;  /* Position relative to the viewport */
-    top: 50%;         /* Position from the top */
-    left: 50%;        /* Position from the left */
-    transform: translate(-50%, -50%);  /* Center the form */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     background-color: lightgray;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    width: 300px;     /* You can adjust the width as needed */
+    width: 300px;
     max-width: 100%;
-    z-index: 1000;    /* Ensure it's on top of other elements */
+    z-index: 1000;
 }
 
 .add_logo{
@@ -312,13 +312,13 @@ textarea{
 }
 
 .star {
-  color: black; /* Default color for unfilled stars */
+  color: black;
   margin-right: 5px;
   transition: color 0.3s ease;
 }
 
 .star.filled {
-  color: gold; /* Filled stars appear in golden color */
+  color: gold;
 }
   
 
@@ -365,8 +365,8 @@ textarea{
 .search-filter{
     height: 10vmin;
     margin-top: 3vmin;
-    display: flex; /* Use flexbox for layout */
-    justify-content: right; /* Gap between input boxes */
+    display: flex;
+    justify-content: right;
 }
 
 .search-filter input{

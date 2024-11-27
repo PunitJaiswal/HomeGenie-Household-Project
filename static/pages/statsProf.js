@@ -15,11 +15,10 @@ const statsProf = {
             <p v-else>No rating data available for this professional.</p>
         </div>
     </div>
-
     `,
     data() {
         return {
-            user_id: sessionStorage.getItem('id'), // Example user_id
+            user_id: sessionStorage.getItem('id'),
             requestImageExists: false,
             ratingImageExists: false,
         };
@@ -28,9 +27,9 @@ const statsProf = {
         async checkImageExists(imagePath) {
             try {
                 const response = await fetch(imagePath, { method: 'HEAD' });
-                return response.ok; // Returns true if the image exists (status 200)
+                return response.ok;
             } catch {
-                return false; // If an error occurs, assume the image doesn't exist
+                return false;
             }
         },
     },
@@ -40,10 +39,7 @@ const statsProf = {
                 'Authentication-Token': sessionStorage.getItem('token')
             }
         });
-        // Check if the request count image exists
         this.requestImageExists = await this.checkImageExists(`./static/images/request_count_by_professional_${this.user_id}.png`);
-        
-        // Check if the rating image exists
         this.ratingImageExists = await this.checkImageExists(`./static/images/rating_for_professional_${this.user_id}.png`);
     },
 };

@@ -157,7 +157,7 @@ const profile = {
         openEditForm(user) {
             this.user = { ...user };
             this.showViewForm = false;
-            this.showEditForm = true;        // Show the edit form
+            this.showEditForm = true;
         },
         handleFileUpload(event) {
             const file = event.target.files[0];

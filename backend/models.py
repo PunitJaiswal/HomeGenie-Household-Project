@@ -24,9 +24,8 @@ class Role(db.Model, RoleMixin):
 class UserRoles(db.Model):
     __tablename__ = 'user_roles'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))  # Match the case of the table name
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id')) 
     role_id = db.Column(db.Integer, db.ForeignKey('role.id'))
-
 
 
 class User(db.Model, UserMixin):

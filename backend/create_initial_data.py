@@ -11,7 +11,7 @@ def create_data(user_datastore):
     user_datastore.find_or_create_role(name='customer', description='Customer')
 
     # Create User data
-    if not user_datastore.find_user(email='admin@iitm.ac.in'):
-        user_datastore.create_user(email='admin@iitm.ac.in', password=hash_password('pass'), roles=['admin'], username='admin', active=True)
+    if not user_datastore.find_user(email='admin@homegenie.com'):
+        user_datastore.create_user(email='admin@homegenie.com', password=hash_password('pass'), roles=['admin'], username='admin', active=True)
 
     db.session.commit()

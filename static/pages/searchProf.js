@@ -150,11 +150,10 @@ const searchProf = {
             this.prof = prof;
         },
         async sendRequest() {
-            // Ensure the necessary fields are populated
-            this.newRequest.professional_id = this.prof.id; // From the selected professional
-            this.newRequest.service_id = this.prof.service_id; // Service ID is likely stored in the selected professional object
-            this.newRequest.remarks = this.newRequest.remarks || ''; // Remarks provided by the user
-            this.newRequest.customer_id = sessionStorage.getItem('id'); // Get customer ID from session storage
+            this.newRequest.professional_id = this.prof.id;
+            this.newRequest.service_id = this.prof.service_id;
+            this.newRequest.remarks = this.newRequest.remarks || '';
+            this.newRequest.customer_id = sessionStorage.getItem('id');
         
             
             const response = await fetch(`${window.location.origin}/api/requests`, {
@@ -169,17 +168,17 @@ const searchProf = {
             if (response.ok) {
                 const result = await response.json();
                 this.$refs.alert.showAlert('Request Sent successfully', 'success')
-                this.showAddForm = false; // Close the form on success
+                this.showAddForm = false;
             } else {
                 const error = await response.json();
                 this.$refs.alert.showAlert('Failed to send request', 'error');
             }
         },
         async searchProf() {
-            this.status = ""; // Clear previous status
-            this.message = ""; // Clear previous messages
-            this.activeProfs = []; // Reset the professional list
-            this.loading = true; // Indicate the loading state
+            this.status = "";
+            this.message = "";
+            this.activeProfs = [];
+            this.loading = true;
     
             const response = await fetch(`${window.location.origin}/searchProf`, {
                 method: 'POST',
@@ -188,9 +187,9 @@ const searchProf = {
                     'Authentication-Token': sessionStorage.getItem('token'),
                 },
                 body: JSON.stringify({
-                    name: this.name?.trim() || null, // Send null if the field is empty
+                    name: this.name?.trim() || null,
                     location: this.location?.trim() || null,
-                    pincode: this.pincode?.trim() || null, // Send null if not provided
+                    pincode: this.pincode?.trim() || null,
                 }),
             });
             const data = await response.json();
@@ -217,7 +216,7 @@ const searchProf = {
               });
               if (userRes.ok) {
                 this.user = await userRes.json();
-                this.showViewForm = true; // Open the view form once data is loaded
+                this.showViewForm = true;
               } else {
                 this.$refs.alert.showAlert('Failed to fetch user data', 'error')
               }

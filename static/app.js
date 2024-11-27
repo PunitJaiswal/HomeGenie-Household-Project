@@ -16,15 +16,11 @@ new Vue({
     router,
     store,
     created() {
-        // Initialize store state on app load
         this.$store.commit('initializeStore');
         
-        // Subscribe to store mutations
         this.$store.subscribe((mutation, state) => {
             if (mutation.type === 'SET_ALERT') {
                 const { message, type } = mutation.payload;
-                
-                // Wait for Vue to fully render and $refs to be available
                 this.$nextTick(() => {
                     if (this.$refs.alert) {
                         console.log("Calling showAlert from store subscription");

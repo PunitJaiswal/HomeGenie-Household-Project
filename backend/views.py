@@ -7,7 +7,7 @@ from datetime import datetime
 from backend.models import *
 from backend.graphs import *
 from werkzeug.utils import secure_filename
-from backend.celery.tasks import create_csv
+from backend.celery.tasks import create_csv, create_service_csv
 from celery.result import AsyncResult
 
 def create_view(app: Flask, user_datastore : SQLAlchemySessionUserDatastore, db, cache):
@@ -70,19 +70,21 @@ def create_view(app: Flask, user_datastore : SQLAlchemySessionUserDatastore, db,
             return jsonify({"status": "warning", "message": "Pincode must be 6 digits"}), 400
         if len(contact) != 10:
             return jsonify({"status": "warning", "message": "Contact must be 10 digits"}), 400
-        if description_file:
-            # Save the file securely
-            filename = secure_filename(description_file.filename)
-            upload_folder = './static/upload_folder'
-            if not os.path.exists(upload_folder):
-                os.makedirs(upload_folder)
-            description_path = os.path.join(upload_folder, filename)
-            description_file.save(description_path)
-        else:
-            return jsonify({"status": "warning", "message": "Please attach description file"}), 400
+        
 
 
         if role == 'professional':
+            if description_file:
+                # Save the file securely
+                filename = secure_filename(description_file.filename)
+                upload_folder = './static/upload_folder'
+                if not os.path.exists(upload_folder):
+                    os.makedirs(upload_folder)
+                description_path = os.path.join(upload_folder, filename)
+                description_file.save(description_path)
+            else:
+                return jsonify({"status": "warning", "message": "Please attach description file"}), 400
+            
             user_datastore.create_user(
                 email=email,
                 password=hash_password(password),
@@ -127,9 +129,6 @@ def create_view(app: Flask, user_datastore : SQLAlchemySessionUserDatastore, db,
         user.pincode = request.form.get('pincode') or user.pincode
         user.contact = request.form.get('contact') or user.contact
         user.date_crated = datetime.utcnow()
-
-        # Debug log
-        print(f"User roles: {[role.name for role in user.roles]}")
 
         if any(role.name == 'professional' for role in user.roles):
             user.service_id = request.form.get('service_id') or user.service_id
@@ -266,13 +265,11 @@ def create_view(app: Flask, user_datastore : SQLAlchemySessionUserDatastore, db,
     @login_required
     @roles_accepted('customer', 'admin')
     def searchProf():
-        # Get JSON data from the request body
         data = request.get_json()
         name = data.get('name')
         location = data.get('location')
         pincode = data.get('pincode')
         
-        # Build the query dynamically
         query = user_datastore.user_model.query
         if name:
             query = query.filter(user_datastore.user_model.name.ilike(f"%{name}%"))  # Case-insensitive match
@@ -287,11 +284,9 @@ def create_view(app: Flask, user_datastore : SQLAlchemySessionUserDatastore, db,
             user for user in matching_users if any(role.name == 'professional' for role in user.roles)
         ]
 
-        # Handle no results
         if not professionals:
             return jsonify({'status': 'success', 'message': 'No professionals found matching the criteria'}), 404
 
-        # Serialize the results
         results = [
             {
                 'id': user.id,
@@ -364,7 +359,6 @@ def create_view(app: Flask, user_datastore : SQLAlchemySessionUserDatastore, db,
             for user in customers
         ]
 
-        # Return both professional and customer lists
         return jsonify({
             'status': 'success',
             'professionals': professional_results,
@@ -454,6 +448,19 @@ def create_view(app: Flask, user_datastore : SQLAlchemySessionUserDatastore, db,
     
     @app.get('/get-service-request/<task_id>')
     def getCSV(task_id):
+        result = AsyncResult(task_id)
+        if result.ready():
+            return send_file(f'./backend/celery/user-downloads/{result.result}')
+        else:
+            return {'message' : 'Task not ready'}
+
+    @app.get('/create-service-csv')
+    def create_Service_csv():
+        task = create_service_csv.delay()
+        return {'task_id' : task.id}, 200
+    
+    @app.get('/get-service-csv/<task_id>')
+    def get_Service_csv(task_id):
         result = AsyncResult(task_id)
         if result.ready():
             return send_file(f'./backend/celery/user-downloads/{result.result}')

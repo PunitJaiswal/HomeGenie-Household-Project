@@ -215,6 +215,7 @@ class ServiceRequestbyProfessional(Resource):
             'rating': Review.query.filter_by(request_id=requests.id).first().rating if Review.query.filter_by(request_id=requests.id).first() else 'Not Rated',
             'service_id': requests.service_id,
             'location' : User.query.get(requests.customer_id).location,
+            'pincode' : User.query.get(requests.customer_id).pincode,
             'service_type': Service.query.get(requests.service_id).name,
             'date_of_request': requests.date_of_request.strftime("%Y-%m-%d %H:%M:%S") if requests.date_of_request else None,
             'date_of_completion': requests.date_of_completion.strftime("%Y-%m-%d %H:%M:%S") if requests.date_of_completion else None,
@@ -223,6 +224,29 @@ class ServiceRequestbyProfessional(Resource):
         } for requests in allrequests]
         if not allrequests:
             return {'message': f'No requests found for professional ID {professional_id}'}, 404
+        return result, 200
+
+class ServiceRequestbyAdmin(Resource):
+    @auth_required('token')
+    @roles_required('admin')
+    def get(self):
+        allrequests = ServiceRequest.query.all()
+        result = [{
+            'id': requests.id,
+            'customer_id': requests.customer_id,
+            'cust_name': User.query.get(requests.customer_id).name,
+            'professional_id': requests.professional_id,
+            'prof_name' : User.query.get(requests.professional_id).name,
+            'prof_name': User.query.get(requests.professional_id).name,
+            'service_id': requests.service_id,
+            'service_type': Service.query.get(requests.service_id).name,
+            'date_of_request': requests.date_of_request.strftime("%Y-%m-%d %H:%M:%S") if requests.date_of_request else None,
+            'date_of_completion': requests.date_of_completion.strftime("%Y-%m-%d %H:%M:%S") if requests.date_of_completion else None,
+            'status': requests.status,
+            'remarks': requests.remarks
+        } for requests in allrequests]
+        if not allrequests:
+            return {'message': 'No requests found'}, 404
         return result, 200
 
 class acceptRequest(Resource):
@@ -309,6 +333,7 @@ api.add_resource(deleteRequest, '/requests/delete/<int:request_id>')
 api.add_resource(updateRequest, '/requests/update/<int:request_id>')
 api.add_resource(ServiceRequestbyCustomer, '/requests/customer/<int:customer_id>')
 api.add_resource(ServiceRequestbyProfessional, '/requests/professional/<int:professional_id>')
+api.add_resource(ServiceRequestbyAdmin, '/requests/admin')
 
 # Actions Performed by Professional
 api.add_resource(acceptRequest, '/requests/accept/<int:request_id>')

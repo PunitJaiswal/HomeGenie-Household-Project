@@ -102,15 +102,14 @@ const signup = {
         handleFileUpload(event) {
             const file = event.target.files[0];
             if (file) {
-                this.description = file; // Store the file object
+                this.description = file;
             } else {
-                this.description = null; // Clear file if nothing is selected
+                this.description = null;
             }
         },
         async submitInfo() {
             const formData = new FormData();
         
-            // Append all text data
             formData.append('email', this.email);
             formData.append('password', this.password);
             formData.append('role', this.role);
@@ -122,7 +121,6 @@ const signup = {
             formData.append('pincode', this.pincode);
             formData.append('contact', this.contact);
         
-            // Append the file
             if (this.description) {
                 formData.append('description', this.description); 
             }

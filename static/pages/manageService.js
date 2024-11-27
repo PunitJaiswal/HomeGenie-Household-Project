@@ -4,7 +4,10 @@ const manageService = {
     template: `
     <div class='dashboard'>
         <alertComponent ref='alert' />
-        <h1><u>Manage Services</u></h1>
+        <div style="display: flex; justify-content: space-between;">
+            <h1><u>Manage Services</u></h1>
+            <button style="text-align:right; height:5vmin;" class='view_link' @click='getServiceCsv'>Get CSV File</button>
+        </div>
         <br>
         <table v-if="allServices.length" class="view_table">
             <thead class="table_head">
@@ -37,12 +40,6 @@ const manageService = {
         <h3 v-if="!allServices.length">No Service registered yet</h3>
         <br><br>
         <p class="add_logo" v-if="!showAddForm" @click="showAddForm = true"><i class="fa-solid fa-circle-plus"></i></p>
-        
-        <div style="text-align:left;">
-            <h2><u>Get All Service Requests</u></h2>
-            <br>
-            <button class='accept_link' @click='getServiceRequest'>Get CSV File</button>
-        </div>
 
         <!-- Add Service Form -->
         <div v-if="showAddForm" class="add_service_form">
@@ -78,6 +75,43 @@ const manageService = {
                 <button type="button" @click="showEditForm = false" class="reject_link">Cancel</button>
             </form>
         </div>
+
+        <div style="text-align:left;">
+            <div style="justify-content: space-between; display: flex; height:5vmin;">
+                <h2><u>All Service Requests</u></h2>
+                <br>
+                <button class='view_link' @click='getServiceRequest'>Get CSV File</button>
+            </div>
+            <br>
+            <table v-if="allRequests.length" class="view_table">
+                <thead class="table_head">
+                    <tr>
+                        <td colspan="7" style="text-align:center; background-color: #748cab">
+                            <h2>All Service Requests</h2>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><h3>Service Name</h3></td>
+                        <td><h3>Customer Name</h3></td>
+                        <td><h3>Professional Name</h3></td>
+                        <td><h3>Message</h3></td>
+                        <td><h3>Status</h3></td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="request in allRequests" :key="request.id">
+                        <td>{{request.service_type}}</td>
+                        <td>{{request.cust_name}}</td>
+                        <td>{{request.prof_name}}</td>
+                        <td>{{request.remarks}}</td>
+                        <td class='pending-word' v-if="request.status == 'Pending'"><strong>{{request.status}}</strong></td>
+                        <td class='accepted-word' v-if="request.status == 'Accepted'"><strong>{{request.status}}</strong></td>
+                        <td class='rejected-word' v-if="request.status == 'Rejected'"><strong>{{request.status}}</strong></td>
+                        <td class='completed-word' v-if="request.status == 'Closed'"><strong>{{request.status}}</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
     `,
     data() {
@@ -92,6 +126,7 @@ const manageService = {
                 base_price: null,
                 time_required: null
             },
+            allRequests:[],
         };
     },
     methods: {
@@ -128,8 +163,8 @@ const manageService = {
         },
 
         openEditForm(service) {
-            this.newService = { ...service }; // Clone the service to avoid direct mutation
-            this.showEditForm = true;        // Show the edit form
+            this.newService = { ...service };
+            this.showEditForm = true;
         },
         async updateService(service) {
             const res = await fetch(window.location.origin + '/api/services/update/' + service.id, {
@@ -200,6 +235,27 @@ const manageService = {
                     this.$refs.alert.showAlert('CSV File Downloaded', 'info')
                 }
             }, 1000);
+        },
+        async getServiceCsv() {
+            const res = await fetch(window.location.origin + '/create-service-csv', {
+                headers: {
+                    'Authentication-Token': sessionStorage.getItem('token'),
+                },
+            });
+            const task_id = (await res.json()).task_id
+
+            const interval = setInterval(async() => {
+                const res = await fetch(window.location.origin + '/get-service-csv/' + task_id, {
+                    headers: {
+                        'Authentication-Token': sessionStorage.getItem('token'),
+                    },
+                });
+                if (res.ok) {
+                    window.open(`${window.location.origin}/get-service-csv/${task_id}`);
+                    clearInterval(interval);
+                    this.$refs.alert.showAlert('CSV File Downloaded', 'info')
+                }
+            }, 1000);
         }
     },
     async mounted() {
@@ -211,7 +267,19 @@ const manageService = {
         if (response.ok) {
             this.allServices = await response.json();
         } else {
-            alert('Failed to fetch services');
+            this.$refs.alert.showAlert('Failed to fetch services', 'error')
+        }
+        // Get all Service Request
+        const res = await fetch(window.location.origin + '/api/requests/admin', {
+            headers: {
+                'Authentication-Token': sessionStorage.getItem('token')
+            },
+        });
+        if (res.ok) {
+            this.allRequests = await res.json();
+        }
+        else {
+            this.$refs.alert.showAlert('Failed to fetch requests', 'error')
         }
     },
     components: {

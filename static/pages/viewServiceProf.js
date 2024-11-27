@@ -129,7 +129,6 @@ const viewServiceProf = {
             this.prof = prof;
         },
         async sendRequest() {
-            // Populate the newRequest object with the relevant values
             this.newRequest.professional_id = this.prof.id;
             this.newRequest.service_id = this.service.id;
             this.newRequest.remarks = this.newRequest.remarks || '';

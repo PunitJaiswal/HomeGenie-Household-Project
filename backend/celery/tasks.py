@@ -3,7 +3,7 @@ from backend.models import ServiceRequest
 import flask_excel
 from flask import render_template
 from backend.celery.mail_service import send_email
-from backend.models import User, ServiceRequest, db
+from backend.models import User, ServiceRequest, db, Service
 from datetime import datetime, timedelta
 from sqlalchemy import text
 
@@ -22,10 +22,22 @@ def create_csv(self):
 
     return filename
 
+@shared_task(bind = True, ignore_result = False)
+def create_service_csv(self):
+    resource = Service.query.all()
+    task_id = self.request.id
+    filename = f'Service_{task_id}.csv'
+    column_names = [column.name for column in Service.__table__.columns]
+    csv_out = flask_excel.make_response_from_query_sets(resource, column_names = column_names, file_type='csv')
+
+    with open(f'./backend/celery/user-downloads/{filename}', 'wb') as file:
+        file.write(csv_out.data)
+
+    return filename
+
 
 @shared_task(ignore_result=True)
 def send_daily_reminders():
-    # Fetch pending requests grouped by professionals
     pending_requests = ServiceRequest.query.filter(ServiceRequest.status != 'Closed').all()
 
     # Group requests by professional
@@ -45,7 +57,6 @@ def send_daily_reminders():
         professional = professional_data["professional"]
         requests = professional_data["requests"]
 
-        # Render the email content using an HTML template
         subject = "Daily Reminder: Pending Service Requests"
         content = f"""
             <div>
@@ -62,17 +73,15 @@ def send_daily_reminders():
 
 @shared_task(ignore_result=True)
 def send_monthly_activity_report():
-    # Get the current date and calculate the previous month
     thirty_days_ago = datetime.now() - timedelta(days=30)
 
     # Query service requests within the last month
     query = text("""
-    SELECT *
-    FROM service_request 
-    WHERE service_request.date_of_request >= :date
-""")
+        SELECT *
+        FROM service_request 
+        WHERE service_request.date_of_request >= :date
+    """)
 
-    # Execute the query with a bound parameter
     result = db.session.execute(query, {'date': thirty_days_ago})
     monthly_requests = result.fetchall()
 
@@ -99,10 +108,7 @@ def send_monthly_activity_report():
     for customer_report in customer_data.values():
         customer = customer_report["customer"]
 
-        # Email Subject
         subject = "Your Monthly Activity Report"
-
-        # Generate email content using HTML template
         content = render_template(
             'monthly_report.html',
             customer=customer,

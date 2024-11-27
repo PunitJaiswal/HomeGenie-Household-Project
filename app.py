@@ -17,22 +17,16 @@ security = Security()
 def create_app():
     app = Flask(__name__)
 
-    # Load configuration
     app.config.from_object(LocalDevelopmentConfig)
     
-    # Initialize CSRF protection
     csrf = CSRFProtect(app)
 
-    # cache init
     cache = Cache(app)
 
-    # flask-excel
     excel.init_excel(app)
 
-    # Initialize models
     db.init_app(app)
 
-    # Initialize Flask-Security
     with app.app_context():
         user_datastore = SQLAlchemyUserDatastore(db, User, Role)
         security.init_app(app, user_datastore)
@@ -43,7 +37,6 @@ def create_app():
     app.cache = cache
     app.app_context().push()
 
-    # Initialize Flask-Restful API
     from backend.resources import api
     api.init_app(app)
 

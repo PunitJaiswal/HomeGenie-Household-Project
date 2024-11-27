@@ -142,10 +142,10 @@ const dashboardAdmin = {
         },
         // Search User
         async searchUser() {
-            this.status = ""; // Clear previous status
-            this.message = ""; // Clear previous messages
-            this.activeProfs = []; // Reset the professional list
-            this.loading = true; // Indicate the loading state
+            this.status = ""; 
+            this.message = "";
+            this.activeProfs = [];
+            this.loading = true;
             
             const response = await fetch(`${window.location.origin}/searchUser`, {
                 method: 'POST',
@@ -154,30 +154,27 @@ const dashboardAdmin = {
                     'Authentication-Token': sessionStorage.getItem('token'),
                 },
                 body: JSON.stringify({
-                    name: this.name?.trim() || null, // Send null if the field is empty
+                    name: this.name?.trim() || null,
                     location: this.location?.trim() || null,
                     pincode: this.pincode?.trim() || null,
-                    role: this.role || null, // Send null if not provided
+                    role: this.role || null,
                 }),
             });
     
             const data = await response.json();
     
             if (!response.ok) {
-                // Handle errors with appropriate message
                 this.status = "error";
                 this.message = data.message || "Failed to fetch professionals. Please try again.";
                 this.$refs.alert.showAlert('User Searched Successfully', 'success')
             }
     
-            // Handle success response
             if (data.customers.length > 0 || data.professionals.length > 0) {
                 this.allCusts = data.customers;
                 this.allProfs = data.professionals;
                 this.status = "success";
                 this.message = "Users searched successfully.";
             } else {
-                // No Users found
                 this.allProfs = [];
                 this.allCusts = [];
                 this.status = "error";
@@ -187,8 +184,6 @@ const dashboardAdmin = {
         
         // View User
         async viewUser(id) {
-            this.isLoading = true; // Set loading state to true
-    
             // Fetch user data before navigating
             const userRes = await fetch(window.location.origin + '/viewUser/' + id, {
                 headers: {
@@ -198,7 +193,6 @@ const dashboardAdmin = {
             
             if (!userRes.ok) throw new Error('Failed to fetch user data');
             
-            // Now, navigate after the data is fetched
             this.$router.push('/viewUser/' + id);
         },              
     },
