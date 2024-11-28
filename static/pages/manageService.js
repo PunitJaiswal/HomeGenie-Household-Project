@@ -279,7 +279,7 @@ const manageService = {
             this.allRequests = await res.json();
         }
         else {
-            this.$refs.alert.showAlert('Failed to fetch requests', 'error')
+            console.log('No requests available');
         }
     },
     components: {

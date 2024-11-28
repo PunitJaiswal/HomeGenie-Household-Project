@@ -46,9 +46,9 @@ const dashboardCust = {
                     <td>{{req.service_type}}</td>
                     <td>{{req.remarks}}</td>
                     <td>{{req.date_of_request}}</td>
-                    <td class="pending-word" v-if="req.status ==='Pending'">{{req.status}}</td>
-                    <td class="rejected-word" v-if="req.status ==='Rejected'">{{req.status}}</td>
-                    <td class="accepted-word" v-if="req.status ==='Accepted'">{{req.status}}</td>
+                    <td class="pending-word" v-if="req.status ==='Pending'"><h3>{{req.status}}</h3></td>
+                    <td class="rejected-word" v-if="req.status ==='Rejected'"><h3>{{req.status}}</h3></td>
+                    <td class="accepted-word" v-if="req.status ==='Accepted'"><h3>{{req.status}}</h3></td>
                     <td class="completed-word" v-if="req.status ==='Closed'"><h3>{{req.status}}</h3></td>
                     <td>
                         <button class="view_link" v-if="req.status === 'Pending'" @click="openEditForm(req)">Edit</button>

@@ -3,7 +3,7 @@ const home = {
     <div class='home'>
         <h1> Welcome to HomeGenie </h1>
         <br>
-        <p style='font-size:20px;'> Connecting you with trusted professionals for your household needs. </p>
+        <h2> Connecting you with trusted professionals for your household needs. </h2>
         <br><br>
         <button class='reg-btn'><router-link to='/Login'>Login</router-link></button>
         <br><br><br>

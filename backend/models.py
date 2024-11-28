@@ -13,6 +13,9 @@ class Service(db.Model):
     description = db.Column(db.String)
     base_price = db.Column(db.Integer, nullable=False)
     time_required = db.Column(db.Integer)
+    # Relationships
+    professionals = db.relationship('User', backref='service', cascade="all, delete")
+    requests = db.relationship('ServiceRequest', backref='service', cascade="all, delete")
 
 class Role(db.Model, RoleMixin):
     __tablename__ = 'role'

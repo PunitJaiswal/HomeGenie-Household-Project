@@ -245,8 +245,6 @@ class ServiceRequestbyAdmin(Resource):
             'status': requests.status,
             'remarks': requests.remarks
         } for requests in allrequests]
-        if not allrequests:
-            return {'message': 'No requests found'}, 404
         return result, 200
 
 class acceptRequest(Resource):
