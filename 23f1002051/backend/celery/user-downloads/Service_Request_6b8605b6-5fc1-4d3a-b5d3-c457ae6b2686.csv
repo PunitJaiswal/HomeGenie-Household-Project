@@ -1,0 +1,4 @@
+id,customer_id,service_id,professional_id,remarks,date_of_request,date_of_completion,status
+1,3,1,2,paint my home,2024-11-24T20:36:52.838869,2024-11-24T20:55:15.318981,Closed
+2,3,1,2,paint my bike,2024-11-24T20:39:50.171570,2024-11-24T20:58:41.578434,Closed
+3,3,3,4,Pipe fitting,2024-11-25T19:56:21.594489,2024-11-25T20:00:36.237220,Closed

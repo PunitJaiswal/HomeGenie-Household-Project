@@ -1,0 +1,8 @@
+id,name,description,base_price,time_required
+1,Repairing Service,Repair your essential electricals at your doorstep,200,1
+2,Electricity Service,Electricity Repairing and Wiring Service,500,6
+3,Vehicle Servicing,"Service your Car, Bike etc at your home",400,2
+4,House Furnishing,Repair or furnish your house with experts,500,4
+5,Gardening Service,Get your Garden Glorified,200,1
+6,Cleaning Service,"Get your rooms, hall and house cleaned and sanitized",100,1
+7,Salon Service ,Get your hair style at home ,100,1

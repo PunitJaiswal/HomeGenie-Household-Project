@@ -1,0 +1,7 @@
+id,customer_id,service_id,professional_id,remarks,date_of_request,date_of_completion,status
+1,9,1,2,Repair my bike,2024-11-28T15:21:48.878806,2024-11-28T15:22:27.619350,Closed
+2,9,4,6,Make a sofa for drawing room,2024-11-28T15:24:24.442453,,Pending
+3,10,1,2,Repair my AC,2024-11-28T15:25:00.747843,,Pending
+4,12,1,2,Reapir my AC and clean,2024-11-29T09:41:12.195786,2024-11-29T09:43:42.311334,Closed
+5,14,6,13,clean,2024-11-29T12:03:03.050309,,Pending
+6,14,1,2,repair the ac,2024-11-29T12:06:04.846895,,Accepted

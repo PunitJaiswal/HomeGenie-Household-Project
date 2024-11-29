@@ -1,0 +1,4 @@
+id,customer_id,service_id,professional_id,remarks,date_of_request,date_of_completion,status
+1,4,1,2,Clean my home,2024-11-27T12:47:25.980671,2024-11-27T12:47:50.342709,Closed
+2,4,2,3,repair my bike,2024-11-27T12:51:34.515284,,Pending
+3,4,2,3,Repair the ac,2024-11-27T12:52:02.221413,,Accepted

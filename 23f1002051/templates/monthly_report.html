@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monthly Activity Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 80%;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #007BFF;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background: #f9f9f9;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+        }
+        .footer a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Monthly Activity Report</h1>
+        <h2>Hello {{ customer.name }},</h2>
+        <p>Here is a summary of your activity for {{ start_date }}:</p>
+        <ul>
+            <li><strong>Total Services Requested:</strong> {{ total_requested }}</li>
+            <li><strong>Total Services Closed:</strong> {{ total_closed }}</li>
+        </ul>
+        <h3>Details of Your Requests:</h3>
+        <ul>
+            {% for service in services %}
+            <li>
+                <strong>Service ID:</strong> {{ service.id }}<br>
+                <strong>Status:</strong> {{ service.status }}<br>
+                <strong>Remarks:</strong> {{ service.remarks }}<br>
+                <strong>Date of Request:</strong> {{ service.date_of_request}}<br>
+                {% if service.date_of_completion %}
+                <strong>Date of Completion:</strong> {{ service.date_of_completion}}
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+        <div class="footer">
+            <p>Thank you for choosing HomeGenie!</p>
+            <h3>Team HomeGenie</h3>
+        </div>
+    </div>
+</body>
+</html>

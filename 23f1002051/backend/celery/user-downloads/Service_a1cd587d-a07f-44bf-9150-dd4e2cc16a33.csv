@@ -1,0 +1,7 @@
+id,name,description,base_price,time_required
+1,Cleaning,Clean the floor ,100,1
+2,Repairing Service,Repair or Furnish your house with experts,1000,2
+3,Electricity Service,Electricity Repairing and Wiring Service,200,2
+4,Painting Service,"Paint your walls, appliances and window",2000,4
+5,Gardening Service,Get your garden glorified,200,1
+6,Salon Service,Get your facial hairstyling and more at your home,500,1
